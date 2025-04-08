@@ -20,6 +20,7 @@ jobs:
           port: 22
           script: |
             cd /var/www/project-manager-backend/
+            git checkout develop
             git pull origin develop
             cd /opt/docker-setups/maven/
             docker-compose down
