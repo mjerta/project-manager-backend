@@ -68,7 +68,7 @@ A single-user project management dashboard built with Java Spring Boot backend a
 9. The UI must be styled using Styled Components or Tailwind CSS.
 10. The system must be containerized using Docker for deployment.
 
-```
+```mermaid
 classDiagram
     class Project {
         +Long id
