@@ -20,12 +20,20 @@ public class StatusService {
     return statusRepository.save(status);
   }
 
-  public Status getStatusById(Long id){
+  public Status getStatusById(Long id) {
     System.out.println(id);
     return statusRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong here"));
   }
 
   public List<Status> getAllStatus() {
     return statusRepository.findAll();
+  }
+
+  public Status updateStatus(Long id, Status requestUpdateStatus) {
+    Status existingStatus = statusRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Something went wrong here"));
+    existingStatus.setName(requestUpdateStatus.getName());
+    existingStatus.setDescription(requestUpdateStatus.getDescription());
+    return statusRepository.save(existingStatus);
   }
 }
