@@ -1,6 +1,9 @@
 package nl.mpdev.project_manager_backend.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+
 import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.repositories.StatusRepository;
 
@@ -20,5 +23,9 @@ public class StatusService {
   public Status getStatusById(Long id){
     System.out.println(id);
     return statusRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong here"));
+  }
+
+  public List<Status> getAllStatus() {
+    return statusRepository.findAll();
   }
 }

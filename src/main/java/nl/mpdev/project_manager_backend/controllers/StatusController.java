@@ -1,5 +1,7 @@
 package nl.mpdev.project_manager_backend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,5 +36,11 @@ public class StatusController {
   public ResponseEntity<Status> getStatusById(@PathVariable Long id) {
     Status responseStatus = statusService.getStatusById(id);
     return ResponseEntity.status(HttpStatus.OK).body(responseStatus);
+  }
+
+  @GetMapping("/status")
+  public ResponseEntity<List<Status>> getAllStatus() {
+    List<Status> responseAllStatus = statusService.getAllStatus();
+    return ResponseEntity.status(HttpStatus.OK).body(responseAllStatus);
   }
 }
