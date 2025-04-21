@@ -36,4 +36,11 @@ public class StatusService {
     existingStatus.setDescription(requestUpdateStatus.getDescription());
     return statusRepository.save(existingStatus);
   }
+
+  public void deleteStatus(Long id) {
+    if (!statusRepository.existsById(id)) {
+      throw new RuntimeException("Something went wrong here");
+    }
+    statusRepository.deleteById(id);
+  }
 }
