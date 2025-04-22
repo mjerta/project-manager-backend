@@ -3,6 +3,8 @@ package nl.mpdev.project_manager_backend.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,12 @@ private final ProjectService projectService;
     System.out.println(project.getTitle());
     Project addedProject = projectService.addProject(project);
     return ResponseEntity.status(HttpStatus.CREATED).body(addedProject);
+  }
+
+  @GetMapping("/projects/{id}")
+  public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
+    Project responseProject = projectService.getProjectById(id);
+    return ResponseEntity.status(HttpStatus.OK).body(responseProject);
   }
 }
 
