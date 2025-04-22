@@ -1,6 +1,9 @@
 package nl.mpdev.project_manager_backend.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+
 import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.repositories.ProjectRepository;
 
@@ -19,5 +22,9 @@ public class ProjectService {
 
   public Project getProjectById(Long id) {
     return projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
+  }
+
+  public List<Project> getAllProjects(){
+    return projectRepository.findAll();
   }
 }

@@ -1,5 +1,7 @@
 package nl.mpdev.project_manager_backend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,14 +20,14 @@ import nl.mpdev.project_manager_backend.services.ProjectService;
 @RequestMapping("/api/v1")
 public class ProjectController {
 
-private final ProjectService projectService;
+  private final ProjectService projectService;
 
   public ProjectController(ProjectService projectService) {
     this.projectService = projectService;
   }
 
   @PostMapping("/projects")
-  public ResponseEntity<Project> addProject(@RequestBody Project project){
+  public ResponseEntity<Project> addProject(@RequestBody Project project) {
     System.out.println(project.getTitle());
     Project addedProject = projectService.addProject(project);
     return ResponseEntity.status(HttpStatus.CREATED).body(addedProject);
@@ -36,5 +38,11 @@ private final ProjectService projectService;
     Project responseProject = projectService.getProjectById(id);
     return ResponseEntity.status(HttpStatus.OK).body(responseProject);
   }
-}
 
+  @GetMapping("/projects")
+  public ResponseEntity<List<Project>> getAllProjects() {
+    List<Project> responseAllProjects = projectService.getAllProjects();
+    return ResponseEntity.status(HttpStatus.OK).body(responseAllProjects);
+  }
+
+}
