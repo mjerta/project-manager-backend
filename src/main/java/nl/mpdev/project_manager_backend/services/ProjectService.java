@@ -12,4 +12,8 @@ public class ProjectService {
   public ProjectService(ProjectRepository projectRepository) {
     this.projectRepository = projectRepository;
   }
+
+  public Project addProject(Project project) {
+    return projectRepository.save(project);
+  }
 }
