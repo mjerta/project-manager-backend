@@ -35,5 +35,9 @@ public class ProjectService {
     existingProject.setStatus(requestUpdateProject.getStatus());
     existingProject.setDescription(requestUpdateProject.getDescription());
     return existingProject;
+  } 
+
+  public void deleteProject(Long id){
+    projectRepository.deleteById(id);
   }
 }
