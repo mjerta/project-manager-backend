@@ -24,7 +24,16 @@ public class ProjectService {
     return projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
   }
 
-  public List<Project> getAllProjects(){
+  public List<Project> getAllProjects() {
     return projectRepository.findAll();
+  }
+
+  public Project updateProject(Long id, Project requestUpdateProject) {
+    Project existingProject = projectRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Something went wrong"));
+    existingProject.setTitle(requestUpdateProject.getTitle());
+    existingProject.setStatus(requestUpdateProject.getStatus());
+    existingProject.setDescription(requestUpdateProject.getDescription());
+    return existingProject;
   }
 }
