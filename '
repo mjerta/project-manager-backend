@@ -34,19 +34,18 @@ public class ImageController {
   public ResponseEntity<String> addImage(
       @RequestParam("file") MultipartFile file,
       @RequestParam(value = "name") String name) throws IOException {
-    Image addedImage = imageService.addImage(file, name);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-    .path("/api/v1/images/")
-    .path(String.valueOf(addedImage.getId()))
-    .toUriString();
-    return ResponseEntity.status(HttpStatus.CREATED).body(imageUrl);
+        .path("/api/v1/images/")
+        .path(String.valueOf(addedImage.getId())) // Assuming getId() returns the image ID
+        .toUriString();
+    return ResponseEntity.status(HttpStatus.CREATED).body(addedImage.getId());
   }
 
   @GetMapping("/images/{id}")
   public ResponseEntity<ByteArrayResource> getImage(@PathVariable Long id) {
     Image image = imageService.getImageById(id);
     return ResponseEntity.ok()
-      .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
-      .body(new ByteArrayResource(image.getData()));
+        .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
+        .body(new ByteArrayResource(image.getData()));
   }
 }
