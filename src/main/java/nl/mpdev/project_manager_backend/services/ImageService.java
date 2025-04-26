@@ -28,4 +28,8 @@ public class ImageService {
     image.setData(file.getBytes());
     return imageRepository.save(image);
   }
+
+  public Image getImageById(Long id){
+    return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
+  }
 }
