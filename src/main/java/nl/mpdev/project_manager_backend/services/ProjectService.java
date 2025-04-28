@@ -38,6 +38,9 @@ public class ProjectService {
   } 
 
   public void deleteProject(Long id){
+    if(!projectRepository.existsById(id)){
+      throw new RuntimeException("Record was not found");
+    }
     projectRepository.deleteById(id);
   }
 }
