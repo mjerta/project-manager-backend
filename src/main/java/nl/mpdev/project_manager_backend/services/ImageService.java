@@ -32,4 +32,16 @@ public class ImageService {
   public Image getImageById(Long id){
     return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
   }
+
+  public Image updateImage(Long id, MultipartFile file, String name) throws IOException {
+    if(file.isEmpty()) {
+      throw new IllegalArgumentException("Cannot save empty file");
+    }
+    Image existingImage = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
+    existingImage.setName(name);
+    existingImage.setContentType(file.getContentType());
+    existingImage.setSize(file.getSize());
+    existingImage.setData(file.getBytes());
+    return imageRepository.save(existingImage);
+  }
 }
