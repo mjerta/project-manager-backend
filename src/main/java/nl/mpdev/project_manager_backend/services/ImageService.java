@@ -44,4 +44,11 @@ public class ImageService {
     existingImage.setData(file.getBytes());
     return imageRepository.save(existingImage);
   }
+
+  public void deleteImage(Long id) {
+    if(!imageRepository.existsById(id)) {
+      throw new RuntimeException("This record does not exist");
+    }
+    imageRepository.deleteById(id);
+  }
 }
