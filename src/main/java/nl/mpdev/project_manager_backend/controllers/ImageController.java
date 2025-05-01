@@ -38,7 +38,7 @@ public class ImageController {
   public ResponseEntity<String> addImage(
       @RequestParam("file") MultipartFile file,
       @RequestParam(value = "name") String name,
-      @RequestParam(value = "project") Long projectId) throws IOException {
+      @RequestParam(value = "project", required = false) Long projectId) throws IOException {
     Image addedImage = imageService.addImage(file, name, projectId);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/api/v1/images/")
@@ -59,8 +59,10 @@ public class ImageController {
   public ResponseEntity<String> updateImage(
       @PathVariable Long id,
       @RequestParam("file") MultipartFile file,
-      @RequestParam(value = "name") String name) throws IOException {
-    Image updatedImage = imageService.updateImage(id, file, name);
+      @RequestParam(value = "name") String name,
+      @RequestParam(value = "project", required = false) Long projectId
+  ) throws IOException {
+    Image updatedImage = imageService.updateImage(id, file, name, projectId);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/api/v1/images/")
         .path(String.valueOf(updatedImage.getId()))

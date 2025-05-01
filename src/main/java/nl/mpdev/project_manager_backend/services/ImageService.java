@@ -28,7 +28,7 @@ public class ImageService {
     image.setContentType(file.getContentType());
     image.setSize(file.getSize());
     image.setData(file.getBytes());
-    image.setProject(projectService.getProjectById(projectId));
+    if (projectId != null) image.setProject(projectService.getProjectById(projectId));
     return imageRepository.save(image);
   }
 
@@ -36,7 +36,7 @@ public class ImageService {
     return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
   }
 
-  public Image updateImage(Long id, MultipartFile file, String name) throws IOException {
+  public Image updateImage(Long id, MultipartFile file, String name, Long projectId) throws IOException {
     if(file.isEmpty()) {
       throw new IllegalArgumentException("Cannot save empty file");
     }
@@ -45,6 +45,7 @@ public class ImageService {
     existingImage.setContentType(file.getContentType());
     existingImage.setSize(file.getSize());
     existingImage.setData(file.getBytes());
+    if (projectId != null) existingImage.setProject(projectService.getProjectById(projectId));
     return imageRepository.save(existingImage);
   }
 
