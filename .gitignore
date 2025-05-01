@@ -34,3 +34,4 @@ build/
 pg_data/
 docker-compose.yml
 .env
+request-data/
