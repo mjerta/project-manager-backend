@@ -37,12 +37,13 @@ public class ImageController {
   @PostMapping("/images")
   public ResponseEntity<String> addImage(
       @RequestParam("file") MultipartFile file,
-      @RequestParam(value = "name") String name) throws IOException {
-    Image addedImage = imageService.addImage(file, name);
+      @RequestParam(value = "name") String name,
+      @RequestParam(value = "project") Long projectId) throws IOException {
+    Image addedImage = imageService.addImage(file, name, projectId);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-    .path("/api/v1/images/")
-    .path(String.valueOf(addedImage.getId()))
-    .toUriString();
+        .path("/api/v1/images/")
+        .path(String.valueOf(addedImage.getId()))
+        .toUriString();
     return ResponseEntity.status(HttpStatus.CREATED).body(imageUrl);
   }
 
@@ -50,20 +51,20 @@ public class ImageController {
   public ResponseEntity<ByteArrayResource> getImage(@PathVariable Long id) {
     Image image = imageService.getImageById(id);
     return ResponseEntity.ok()
-      .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
-      .body(new ByteArrayResource(image.getData()));
+        .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
+        .body(new ByteArrayResource(image.getData()));
   }
 
   @PutMapping("/images/{id}")
   public ResponseEntity<String> updateImage(
-    @PathVariable Long id,
-    @RequestParam("file") MultipartFile file,
-    @RequestParam(value = "name") String name) throws IOException {
+      @PathVariable Long id,
+      @RequestParam("file") MultipartFile file,
+      @RequestParam(value = "name") String name) throws IOException {
     Image updatedImage = imageService.updateImage(id, file, name);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-      .path("/api/v1/images/")
-      .path(String.valueOf(updatedImage.getId()))
-    .toUriString();
+        .path("/api/v1/images/")
+        .path(String.valueOf(updatedImage.getId()))
+        .toUriString();
     return ResponseEntity.status(HttpStatus.OK).body(imageUrl);
   }
 

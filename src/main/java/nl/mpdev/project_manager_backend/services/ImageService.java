@@ -12,12 +12,14 @@ import nl.mpdev.project_manager_backend.repositories.ImageRepository;
 public class ImageService {
 
   private final ImageRepository imageRepository;
+  private final ProjectService projectService;
 
-  public ImageService(ImageRepository imageRepository) {
+  public ImageService(ImageRepository imageRepository, ProjectService projectService) {
     this.imageRepository = imageRepository;
+    this.projectService = projectService;
   }
 
-  public Image addImage(MultipartFile file, String name) throws IOException {
+  public Image addImage(MultipartFile file, String name, Long projectId) throws IOException {
      if (file.isEmpty()) {
       throw new IllegalArgumentException("Cannot save empty file");
     }
@@ -26,6 +28,7 @@ public class ImageService {
     image.setContentType(file.getContentType());
     image.setSize(file.getSize());
     image.setData(file.getBytes());
+    image.setProject(projectService.getProjectById(projectId));
     return imageRepository.save(image);
   }
 
