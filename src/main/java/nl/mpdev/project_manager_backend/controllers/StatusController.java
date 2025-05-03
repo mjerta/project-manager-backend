@@ -1,6 +1,7 @@
 package nl.mpdev.project_manager_backend.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +49,12 @@ public class StatusController {
   }
 
   @GetMapping("/status")
-  public ResponseEntity<List<Status>> getAllStatus() {
+  public ResponseEntity<List<StatusCompleteResponseDto>> getAllStatus() {
     List<Status> responseAllStatus = statusService.getAllStatus();
-    return ResponseEntity.status(HttpStatus.OK).body(responseAllStatus);
+    List<StatusCompleteResponseDto> dtoList = responseAllStatus.stream()
+      .map(statusMapper::toDto)
+      .toList();
+    return ResponseEntity.status(HttpStatus.OK).body(dtoList);
   }
 
   @PutMapping("/status/{id}")
