@@ -50,17 +50,16 @@ public class StatusController {
 
   @GetMapping("/status")
   public ResponseEntity<List<StatusCompleteResponseDto>> getAllStatus() {
-    List<Status> responseAllStatus = statusService.getAllStatus();
-    List<StatusCompleteResponseDto> dtoList = responseAllStatus.stream()
+    List<StatusCompleteResponseDto> dtoList = statusService.getAllStatus().stream()
       .map(statusMapper::toDto)
       .toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtoList);
   }
 
   @PutMapping("/status/{id}")
-  public ResponseEntity<Status> updateStatus(@PathVariable Long id, @RequestBody Status status) {
-    Status updatedStatus = statusService.updateStatus(id, status);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);
+  public ResponseEntity<StatusCompleteResponseDto> updateStatus(@PathVariable Long id, @RequestBody @Valid StatusCompleteRequestDto request) {
+    Status updatedStatus = statusService.updateStatus(id, statusMapper.toEntity(request));
+    return ResponseEntity.status(HttpStatus.OK).body(statusMapper.toDto(updatedStatus));
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
