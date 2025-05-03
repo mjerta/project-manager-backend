@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import nl.mpdev.project_manager_backend.dto.status.request.StatusCompleteRequestDto;
+import nl.mpdev.project_manager_backend.dto.status.response.StatusCompleteResponseDto;
 import nl.mpdev.project_manager_backend.mappers.status.StatusMapper;
 import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.services.StatusService;
@@ -35,9 +36,9 @@ public class StatusController {
   }
 
   @PostMapping("/status")
-  public ResponseEntity<Status> addStatus(@RequestBody @Valid StatusCompleteRequestDto request) {
+  public ResponseEntity<StatusCompleteResponseDto> addStatus(@RequestBody @Valid StatusCompleteRequestDto request) {
     Status addedStatus = statusService.addStatus(statusMapper.toEntity(request));
-    return ResponseEntity.status(HttpStatus.CREATED).body(addedStatus);
+    return ResponseEntity.status(HttpStatus.CREATED).body(statusMapper.toDto(addedStatus));
   }
 
   @GetMapping("/status/{id}")
