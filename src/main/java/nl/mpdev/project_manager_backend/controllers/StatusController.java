@@ -42,9 +42,9 @@ public class StatusController {
   }
 
   @GetMapping("/status/{id}")
-  public ResponseEntity<Status> getStatusById(@PathVariable Long id) {
+  public ResponseEntity<StatusCompleteResponseDto> getStatusById(@PathVariable Long id) {
     Status responseStatus = statusService.getStatusById(id);
-    return ResponseEntity.status(HttpStatus.OK).body(responseStatus);
+    return ResponseEntity.status(HttpStatus.OK).body(statusMapper.toDto(responseStatus));
   }
 
   @GetMapping("/status")
