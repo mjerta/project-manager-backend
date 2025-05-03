@@ -22,5 +22,6 @@ public class StatusMapper {
     dto.setId(entity.getId());
     dto.setName(entity.getName());
     dto.setDescription(entity.getDescription());
+    return dto;
   }
 }
