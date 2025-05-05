@@ -19,25 +19,16 @@ public class ImageService {
     this.projectService = projectService;
   }
 
-  public Image addImage(MultipartFile file, String name, Long projectId) throws IOException {
-     if (file.isEmpty()) {
-      throw new IllegalArgumentException("Cannot save empty file");
-    }
-    Image image = new Image();;
-    image.setName(name);
-    image.setContentType(file.getContentType());
-    image.setSize(file.getSize());
-    image.setData(file.getBytes());
-    if (projectId != null) image.setProject(projectService.getProjectById(projectId));
+  public Image addImage(Image image) {
     return imageRepository.save(image);
   }
 
-  public Image getImageById(Long id){
+  public Image getImageById(Long id) {
     return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
   }
 
   public Image updateImage(Long id, MultipartFile file, String name, Long projectId) throws IOException {
-    if(file.isEmpty()) {
+    if (file.isEmpty()) {
       throw new IllegalArgumentException("Cannot save empty file");
     }
     Image existingImage = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
@@ -45,12 +36,13 @@ public class ImageService {
     existingImage.setContentType(file.getContentType());
     existingImage.setSize(file.getSize());
     existingImage.setData(file.getBytes());
-    if (projectId != null) existingImage.setProject(projectService.getProjectById(projectId));
+    if (projectId != null)
+      existingImage.setProject(projectService.getProjectById(projectId));
     return imageRepository.save(existingImage);
   }
 
   public void deleteImage(Long id) {
-    if(!imageRepository.existsById(id)) {
+    if (!imageRepository.existsById(id)) {
       throw new RuntimeException("This record does not exist");
     }
     imageRepository.deleteById(id);

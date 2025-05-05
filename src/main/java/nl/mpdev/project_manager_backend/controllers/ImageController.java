@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+import nl.mpdev.project_manager_backend.dto.images.request.ImageCompleteRequestDto;
 import nl.mpdev.project_manager_backend.models.Image;
 import nl.mpdev.project_manager_backend.services.ImageService;
+import nl.mpdev.project_manager_backend.mappers.image.ImagesMapper;
+import nl.mpdev.project_manager_backend.dto.images.response.*;;
 
 @RestController
 @CrossOrigin(value = "http://localhost:5173")
@@ -29,22 +34,18 @@ import nl.mpdev.project_manager_backend.services.ImageService;
 public class ImageController {
 
   private final ImageService imageService;
+  private final ImagesMapper imagesMapper;
 
-  public ImageController(ImageService imageService) {
+  public ImageController(ImageService imageService, ImagesMapper imagesMapper) {
     this.imageService = imageService;
+    this.imagesMapper = imagesMapper;
   }
 
   @PostMapping("/images")
-  public ResponseEntity<String> addImage(
-      @RequestParam("file") MultipartFile file,
-      @RequestParam(value = "name") String name,
-      @RequestParam(value = "project", required = false) Long projectId) throws IOException {
-    Image addedImage = imageService.addImage(file, name, projectId);
-    String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-        .path("/api/v1/images/")
-        .path(String.valueOf(addedImage.getId()))
-        .toUriString();
-    return ResponseEntity.status(HttpStatus.CREATED).body(imageUrl);
+  public ResponseEntity<String> addImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto) throws IOException {
+    Image entity = imageService.addImage(imagesMapper.toEntity(requestDto));
+    ImageLinkResponseDto responseDto = imagesMapper.toDto(entity);
+    return ResponseEntity.created(responseDto.getImageLink()).body(responseDto.getProject());
   }
 
   @GetMapping("/images/{id}")
@@ -60,8 +61,7 @@ public class ImageController {
       @PathVariable Long id,
       @RequestParam("file") MultipartFile file,
       @RequestParam(value = "name") String name,
-      @RequestParam(value = "project", required = false) Long projectId
-  ) throws IOException {
+      @RequestParam(value = "project", required = false) Long projectId) throws IOException {
     Image updatedImage = imageService.updateImage(id, file, name, projectId);
     String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/api/v1/images/")

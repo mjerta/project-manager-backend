@@ -1,6 +1,7 @@
 package nl.mpdev.project_manager_backend.mappers.image;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -32,10 +33,10 @@ public class ImagesMapper {
 
   public ImageLinkResponseDto toDto(Image entity) {
     ImageLinkResponseDto dto = new ImageLinkResponseDto();
-    String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+    URI imageUrl = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/api/v1/images")
         .path(String.valueOf(entity.getId()))
-        .toUriString();
+        .toUriString());
     dto.setImageLink(imageUrl);
     return dto;
   }
@@ -45,7 +46,7 @@ public class ImagesMapper {
     dto.setId(entity.getId());
     dto.setName(entity.getName());
     dto.setData(entity.getData());
-    dto.setProjectId(entity.getProject().getId());
+    dto.setProject(entity.getProject().getTitle());
     return dto;
   }
 }
