@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class ImageLinkResponseDto {
   private String imageLink;
+  private String project;
 }
