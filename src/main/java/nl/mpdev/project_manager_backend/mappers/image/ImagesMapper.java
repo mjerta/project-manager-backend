@@ -24,20 +24,25 @@ public class ImagesMapper {
   public Image toEntity(ImageCompleteRequestDto dto) throws IOException {
     Image entity = new Image();
     entity.setName(dto.getName());
-    entity.setData(dto.getImage().getBytes());
-    entity.setSize(dto.getImage().getSize());
-    entity.setContentType(dto.getImage().getContentType());
-    entity.setProject(projectsService.getProjectById(dto.getProjectId()));
+    if (dto.getImage() != null) {
+      entity.setData(dto.getImage().getBytes());
+      entity.setSize(dto.getImage().getSize());
+      entity.setContentType(dto.getImage().getContentType());
+    }
+    if (dto.getProjectId() != null) {
+      entity.setProject(projectsService.getProjectById(dto.getProjectId()));
+    }
     return entity;
   }
 
   public ImageLinkResponseDto toDto(Image entity) {
     ImageLinkResponseDto dto = new ImageLinkResponseDto();
     URI imageUrl = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
-        .path("/api/v1/images")
+        .path("/api/v1/images/")
         .path(String.valueOf(entity.getId()))
         .toUriString());
     dto.setImageLink(imageUrl);
+    dto.setProject(entity.getName();
     return dto;
   }
 

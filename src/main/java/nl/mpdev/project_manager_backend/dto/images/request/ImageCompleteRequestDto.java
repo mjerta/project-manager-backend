@@ -16,8 +16,8 @@ public class ImageCompleteRequestDto {
   @NotBlank
   @Size(min = 3, max = 20, message = "{image.name.size}")
   private String name;
-  @NotNull(message = "{image.mutltipart.notnull}")
+  // @NotNull(message = "{image.mutltipart.notnull}")
   private MultipartFile image;
-  @NotNull(message = "{image.projectId.notNull}")
+  // @NotNull(message = "{image.projectId.notNull}")
   private Long projectId;
 }
