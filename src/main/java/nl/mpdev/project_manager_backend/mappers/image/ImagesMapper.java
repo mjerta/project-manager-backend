@@ -42,7 +42,7 @@ public class ImagesMapper {
         .path(String.valueOf(entity.getId()))
         .toUriString());
     dto.setImageLink(imageUrl);
-    dto.setProject(entity.getName();
+    dto.setProject(entity.getName());
     return dto;
   }
 

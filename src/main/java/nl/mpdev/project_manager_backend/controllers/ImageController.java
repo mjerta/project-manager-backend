@@ -42,10 +42,10 @@ public class ImageController {
   }
 
   @PostMapping("/images")
-  public ResponseEntity<String> addImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto) throws IOException {
+  public ResponseEntity<ImageLinkResponseDto> addImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto) throws IOException {
     Image entity = imageService.addImage(imagesMapper.toEntity(requestDto));
     ImageLinkResponseDto responseDto = imagesMapper.toDto(entity);
-    return ResponseEntity.created(responseDto.getImageLink()).body(responseDto.getProject());
+    return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
   }
 
   @GetMapping("/images/{id}")
