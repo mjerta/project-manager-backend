@@ -42,7 +42,8 @@ public class ImageController {
   }
 
   @PostMapping("/images")
-  public ResponseEntity<ImageLinkResponseDto> addImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto) throws IOException {
+  public ResponseEntity<ImageLinkResponseDto> addImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto)
+      throws IOException {
     Image entity = imageService.addImage(imagesMapper.toEntity(requestDto));
     ImageLinkResponseDto responseDto = imagesMapper.toDto(entity);
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -50,10 +51,14 @@ public class ImageController {
 
   @GetMapping("/images/{id}")
   public ResponseEntity<ByteArrayResource> getImage(@PathVariable Long id) {
-    Image image = imageService.getImageById(id);
+    Image entity = imageService.getImageById(id);
+    ImageByteResponseDto dto = imagesMapper.toByteDto(entity);
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
-        .body(new ByteArrayResource(image.getData()));
+        .header("Id", dto.getId().toString())
+        .header(HttpHeaders.CONTENT_TYPE, dto.getContentType())
+        .header("Project name", dto.getName())
+        .header("Size", dto.getSize().toString())
+        .body(new ByteArrayResource(dto.getData()));
   }
 
   @PutMapping("/images/{id}")

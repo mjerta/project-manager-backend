@@ -50,8 +50,10 @@ public class ImagesMapper {
     ImageByteResponseDto dto = new ImageByteResponseDto();
     dto.setId(entity.getId());
     dto.setName(entity.getName());
+    dto.setSize(entity.getSize());
     dto.setData(entity.getData());
     dto.setProject(entity.getProject().getTitle());
+    dto.setContentType(entity.getContentType());
     return dto;
   }
 }
