@@ -62,17 +62,11 @@ public class ImageController {
   }
 
   @PutMapping("/images/{id}")
-  public ResponseEntity<String> updateImage(
-      @PathVariable Long id,
-      @RequestParam("file") MultipartFile file,
-      @RequestParam(value = "name") String name,
-      @RequestParam(value = "project", required = false) Long projectId) throws IOException {
-    Image updatedImage = imageService.updateImage(id, file, name, projectId);
-    String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-        .path("/api/v1/images/")
-        .path(String.valueOf(updatedImage.getId()))
-        .toUriString();
-    return ResponseEntity.status(HttpStatus.OK).body(imageUrl);
+  public ResponseEntity<ImageLinkResponseDto> updateImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto, Long id)
+       throws IOException {
+    Image entity = imageService.updateImage(imagesMapper.toEntity(requestDto), id);
+    ImageLinkResponseDto responseDto = imagesMapper.toDto(entity);
+    return ResponseEntity.status(HttpStatus.OK).body(responseDto);
   }
 
   @DeleteMapping("/images/{id}")
@@ -81,3 +75,4 @@ public class ImageController {
     imageService.deleteImage(id);
   }
 }
+
