@@ -27,17 +27,14 @@ public class ImageService {
     return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
   }
 
-  public Image updateImage(Long id, MultipartFile file, String name, Long projectId) throws IOException {
-    if (file.isEmpty()) {
-      throw new IllegalArgumentException("Cannot save empty file");
-    }
-    Image existingImage = imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
-    existingImage.setName(name);
-    existingImage.setContentType(file.getContentType());
-    existingImage.setSize(file.getSize());
-    existingImage.setData(file.getBytes());
-    if (projectId != null)
-      existingImage.setProject(projectService.getProjectById(projectId));
+  public Image updateImage(Image image) throws IOException {
+    Image existingImage = imageRepository.findById(image.getId())
+        .orElseThrow(() -> new RuntimeException("Something went wrong"));
+    existingImage.setName(image.getName());
+    existingImage.setContentType(image.getContentType());
+    existingImage.setSize(image.getSize());
+    existingImage.setData(image.getData());
+    existingImage.setProject(projectService.getProjectById(image.getProject().getId()));
     return imageRepository.save(existingImage);
   }
 
