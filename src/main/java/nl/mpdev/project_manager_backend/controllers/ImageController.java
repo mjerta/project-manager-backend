@@ -62,8 +62,9 @@ public class ImageController {
   }
 
   @PutMapping("/images/{id}")
-  public ResponseEntity<ImageLinkResponseDto> updateImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto, Long id)
+  public ResponseEntity<ImageLinkResponseDto> updateImage(@Valid @ModelAttribute ImageCompleteRequestDto requestDto, @PathVariable Long id)
        throws IOException {
+    System.out.println(id);
     Image entity = imageService.updateImage(imagesMapper.toEntity(requestDto), id);
     ImageLinkResponseDto responseDto = imagesMapper.toDto(entity);
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);

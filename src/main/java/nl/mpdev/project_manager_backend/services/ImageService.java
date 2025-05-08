@@ -3,7 +3,6 @@ package nl.mpdev.project_manager_backend.services;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import nl.mpdev.project_manager_backend.models.Image;
 import nl.mpdev.project_manager_backend.repositories.ImageRepository;
