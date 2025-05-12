@@ -24,14 +24,10 @@ public class ImagesMapper {
   public Image toEntity(ImageCompleteRequestDto dto) throws IOException {
     Image entity = new Image();
     entity.setName(dto.getName());
-    if (dto.getImage() != null) {
-      entity.setData(dto.getImage().getBytes());
-      entity.setSize(dto.getImage().getSize());
-      entity.setContentType(dto.getImage().getContentType());
-    }
-    if (dto.getProjectId() != null) {
-      entity.setProject(projectsService.getProjectById(dto.getProjectId()));
-    }
+    entity.setData(dto.getImage().getBytes());
+    entity.setSize(dto.getImage().getSize());
+    entity.setContentType(dto.getImage().getContentType());
+    entity.setProject(projectsService.getProjectById(dto.getProjectId()));
     return entity;
   }
 

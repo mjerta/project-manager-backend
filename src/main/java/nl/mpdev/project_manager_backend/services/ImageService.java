@@ -33,7 +33,7 @@ public class ImageService {
     existingImage.setContentType(image.getContentType());
     existingImage.setSize(image.getSize());
     existingImage.setData(image.getData());
-    existingImage.setProject(projectService.getProjectById(image.getId()));
+    existingImage.setProject(projectService.getProjectById(image.getProject().getId()));
     return imageRepository.save(existingImage);
   }
 
