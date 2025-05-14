@@ -55,9 +55,9 @@ public class ProjectController {
   }
 
   @PutMapping("/projects/{id}")
-  public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody Project project) {
-    Project updatedProject = projectService.updateProject(id, project);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedProject);
+  public ResponseEntity<ProjectCompleteResponseDto> updateProject(@PathVariable Long id, @RequestBody ProjectCompleteRequestDto request) {
+    Project updatedProject = projectService.updateProject(id, projectsMapper.toEntity(request));
+    return ResponseEntity.status(HttpStatus.OK).body(projectsMapper.toDto(updatedProject));
   }
 
   @DeleteMapping("/projects/{id}")
