@@ -41,26 +41,28 @@ public class ProjectController {
   }
 
   @GetMapping("/projects/{id}")
-  public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
+  public ResponseEntity<ProjectCompleteResponseDto> getProjectById(@PathVariable Long id) {
     Project responseProject = projectService.getProjectById(id);
-    return ResponseEntity.status(HttpStatus.OK).body(responseProject);
+    return ResponseEntity.status(HttpStatus.OK).body(projectsMapper.toDto(responseProject));
   }
 
   @GetMapping("/projects")
-  public ResponseEntity<List<Project>> getAllProjects() {
+  public ResponseEntity<List<ProjectCompleteResponseDto>> getAllProjects() {
     List<Project> responseAllProjects = projectService.getAllProjects();
-    return ResponseEntity.status(HttpStatus.OK).body(responseAllProjects);
+    return ResponseEntity.status(HttpStatus.OK).body(responseAllProjects.stream()
+        .map(projectsMapper::toDto)
+        .toList());
   }
 
   @PutMapping("/projects/{id}")
-  public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody Project project){
+  public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody Project project) {
     Project updatedProject = projectService.updateProject(id, project);
     return ResponseEntity.status(HttpStatus.OK).body(updatedProject);
   }
 
   @DeleteMapping("/projects/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteProject(@PathVariable Long id){
+  public void deleteProject(@PathVariable Long id) {
     projectService.deleteProject(id);
   }
 }
