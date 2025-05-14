@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.mpdev.project_manager_backend.dto.projects.request.ProjectCompleteRequestDto;
+import nl.mpdev.project_manager_backend.dto.projects.response.ProjectCompleteResponseDto;
+import nl.mpdev.project_manager_backend.mappers.projects.ProjectsMapper;
 import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.services.ProjectService;
 
@@ -24,16 +27,17 @@ import nl.mpdev.project_manager_backend.services.ProjectService;
 public class ProjectController {
 
   private final ProjectService projectService;
+  private final ProjectsMapper projectsMapper;
 
-  public ProjectController(ProjectService projectService) {
+  public ProjectController(ProjectService projectService, ProjectsMapper projectsMapper) {
     this.projectService = projectService;
+    this.projectsMapper = projectsMapper;
   }
 
   @PostMapping("/projects")
-  public ResponseEntity<Project> addProject(@RequestBody Project project) {
-    System.out.println(project.getTitle());
-    Project addedProject = projectService.addProject(project);
-    return ResponseEntity.status(HttpStatus.CREATED).body(addedProject);
+  public ResponseEntity<ProjectCompleteResponseDto> addProject(@RequestBody ProjectCompleteRequestDto request) {
+    Project addedProject = projectService.addProject(projectsMapper.toEntity(request));
+    return ResponseEntity.status(HttpStatus.CREATED).body(projectsMapper.toDto(addedProject));
   }
 
   @GetMapping("/projects/{id}")
