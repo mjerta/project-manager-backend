@@ -22,7 +22,7 @@ public class ProjectsMapper {
     Project project = new Project();
     project.setTitle(requestDto.getTitle());
     project.setDescription(requestDto.getDescription());
-    project.setStatus(statusService.getStatusById(requestDto.getStatus_id()));
+    project.setStatus(statusService.getStatusById(requestDto.getStatusId()));
     return project;
   }
 
@@ -33,6 +33,7 @@ public class ProjectsMapper {
     dto.setStatus(entity.getStatus().getName());
     dto.setDescription(entity.getDescription());
     // probably needs some null checking here;
+    System.out.println("test projecetsMapper");
     dto.setImageLinks(
       entity.getImages().stream()
         .map(image -> imagesMapper.toDto(image).getImageLink())

@@ -8,5 +8,6 @@ public class ImageByteResponseDto {
   private String name;
   private Long size;
   private byte[] data;
-  private Long projectId;
+  private String contentType;
+  private String project;
 }
