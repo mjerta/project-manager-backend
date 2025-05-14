@@ -16,5 +16,5 @@ public class ProjectCompleteRequestDto {
   private String title;
   private String description;
   @NotNull(message = "{project.statusId.notNull}")
-  private Long status_id;
+  private Long statusId;
 }

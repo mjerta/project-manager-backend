@@ -27,6 +27,7 @@ public class Project {
   @OneToOne
   @JoinColumn(name = "status_id", referencedColumnName = "id")
   private Status status;
-  @OneToMany(mappedBy = "project", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "project", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+      CascadeType.REMOVE }, orphanRemoval = true, fetch = FetchType.EAGER)
   private List<Image> images = new ArrayList<>();
 }
