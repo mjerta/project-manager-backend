@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Service;
 
+import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
 import nl.mpdev.project_manager_backend.models.Image;
 import nl.mpdev.project_manager_backend.repositories.ImageRepository;
 
@@ -23,12 +24,12 @@ public class ImageService {
   }
 
   public Image getImageById(Long id) {
-    return imageRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
+    return imageRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("Image not found"));
   }
 
   public Image updateImage(Image image, Long id) throws IOException {
     Image existingImage = imageRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Something went wrong"));
+        .orElseThrow(() -> new RecordNotFoundException("Image not found"));
     existingImage.setName(image.getName());
     existingImage.setContentType(image.getContentType());
     existingImage.setSize(image.getSize());
@@ -39,7 +40,7 @@ public class ImageService {
 
   public void deleteImage(Long id) {
     if (!imageRepository.existsById(id)) {
-      throw new RuntimeException("This record does not exist");
+      throw new RecordNotFoundException("Image not found");
     }
     imageRepository.deleteById(id);
   }

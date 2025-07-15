@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
 import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.repositories.StatusRepository;
 
@@ -22,7 +23,7 @@ public class StatusService {
 
   public Status getStatusById(Long id) {
     System.out.println(id);
-    return statusRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong here"));
+    return statusRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("Status not found"));
   }
 
   public List<Status> getAllStatus() {
@@ -31,7 +32,7 @@ public class StatusService {
 
   public Status updateStatus(Long id, Status requestUpdateStatus) {
     Status existingStatus = statusRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Something went wrong here"));
+        .orElseThrow(() -> new RecordNotFoundException("Status not found"));
     existingStatus.setName(requestUpdateStatus.getName());
     existingStatus.setDescription(requestUpdateStatus.getDescription());
     return statusRepository.save(existingStatus);
@@ -39,7 +40,7 @@ public class StatusService {
 
   public void deleteStatus(Long id) {
     if (!statusRepository.existsById(id)) {
-      throw new RuntimeException("Something went wrong here");
+      throw new RecordNotFoundException("Status not found");
     }
     statusRepository.deleteById(id);
   }
