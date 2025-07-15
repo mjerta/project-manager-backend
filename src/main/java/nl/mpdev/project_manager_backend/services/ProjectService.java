@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
 import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.repositories.ProjectRepository;
 
@@ -21,7 +22,7 @@ public class ProjectService {
   }
 
   public Project getProjectById(Long id) {
-    return projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Something went wrong"));
+    return projectRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("Project not found"));
   }
 
   public List<Project> getAllProjects() {
@@ -30,7 +31,7 @@ public class ProjectService {
 
   public Project updateProject(Long id, Project requestUpdateProject) {
     Project existingProject = projectRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Something went wrong"));
+        .orElseThrow(() -> new RecordNotFoundException("Project not found"));
     existingProject.setTitle(requestUpdateProject.getTitle());
     existingProject.setStatus(requestUpdateProject.getStatus());
     existingProject.setDescription(requestUpdateProject.getDescription());
@@ -39,7 +40,7 @@ public class ProjectService {
 
   public void deleteProject(Long id){
     if(!projectRepository.existsById(id)){
-      throw new RuntimeException("Record was not found");
+      throw new RecordNotFoundException("Project not found");
     }
     projectRepository.deleteById(id);
   }
