@@ -12,13 +12,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
-import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.repositories.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -70,6 +68,19 @@ public class StatusServiceTest {
     // Assert
     assertEquals("Open", result.getName());
     verify(statusRepository).findById(1L);
+  }
+
+  @Test
+  void getStatusById_ShouldThrow_WhenNotFound() {
+    // Arrange
+    when(statusRepository.findById(99L)).thenReturn(Optional.empty());
+
+    // Act and Assert
+    RecordNotFoundException thrown = assertThrows(RecordNotFoundException.class, () -> {
+      statusService.getStatusById(99L);
+    });
+    assertEquals("Status not found", thrown.getMessage());
+    verify(statusRepository).findById(99L);
   }
 
   @Test
@@ -129,10 +140,8 @@ public class StatusServiceTest {
     when(statusRepository.existsById(1L)).thenReturn(true);
     doNothing().when(statusRepository).deleteById(1L);
 
-    // Act
+    // Act & Assert
     assertDoesNotThrow(() -> statusService.deleteStatus(1L));
-
-    // Assert
     verify(statusRepository).existsById(1L);
     verify(statusRepository).deleteById(1L);
   }
