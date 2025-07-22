@@ -56,9 +56,9 @@ public class ImageServiceTest {
     image2.setName("Image 2");
     image2.setContentType("image/png");
     image2.setProject(project);
-    byte[] jpegBytes = Files.readAllBytes(Paths.get("src/test/resources/sheep.jpg"));
-    image2.setData(jpegBytes);
-    image2.setSize(jpegBytes.length);
+    byte[] jpegBytes2 = Files.readAllBytes(Paths.get("src/test/resources/sheep.jpg"));
+    image2.setData(jpegBytes2);
+    image2.setSize(jpegBytes2.length);
   }
 
   @Test
