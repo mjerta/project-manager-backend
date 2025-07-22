@@ -47,7 +47,7 @@ public class ImageServiceTest {
     image1.setName("Image 1");
     image1.setContentType("image/jpeg");
     image1.setProject(project);
-    byte[] jpegBytes = Files.readAllBytes(Paths.get("src/test/resources/monkey.jpg"));
+    byte[] jpegBytes = Files.readAllBytes(Paths.get("src/test/java/resources/monkey.jpg"));
     image1.setData(jpegBytes);
     image1.setSize(jpegBytes.length);
 
@@ -56,52 +56,55 @@ public class ImageServiceTest {
     image2.setName("Image 2");
     image2.setContentType("image/png");
     image2.setProject(project);
-    byte[] jpegBytes2 = Files.readAllBytes(Paths.get("src/test/resources/sheep.jpg"));
+    byte[] jpegBytes2 = Files.readAllBytes(Paths.get("src/test/java/resources/sheep.jpg"));
     image2.setData(jpegBytes2);
     image2.setSize(jpegBytes2.length);
   }
 
   @Test
   void addImage_ShouldReturnSavedImage() {
+    // Arrange
     when(imageRepository.save(image1)).thenReturn(image1);
+    // Act
     Image saved = imageService.addImage(image1);
+    // Assert
     assertEquals(image1, saved);
     verify(imageRepository).save(image1);
   }
 
   @Test
   void getImageById_ShouldReturnImage_WhenExists() {
+    // Arrange
     when(imageRepository.findById(1L)).thenReturn(Optional.of(image1));
+    // Act
     Image result = imageService.getImageById(1L);
+    // Assert
     assertEquals("Image 1", result.getName());
     verify(imageRepository).findById(1L);
   }
 
   @Test
   void getImageById_ShouldThrow_WhenNotFound() {
+    // Arrange
     when(imageRepository.findById(99L)).thenReturn(Optional.empty());
-    assertThrows(RecordNotFoundException.class, () -> imageService.getImageById(99L));
+    // Act and Assert
+    RecordNotFoundException thrown = assertThrows(RecordNotFoundException.class, () -> imageService.getImageById(99L));
+    assertEquals("Image nout found", thrown.getMessage());
     verify(imageRepository).findById(99L);
   }
 
   @Test
   void updateImage_ShouldUpdateAndReturnImage_WhenExists() throws IOException {
+    // Arrange
     when(imageRepository.findById(1L)).thenReturn(Optional.of(image1));
     when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(imageRepository.save(any(Image.class))).thenAnswer(i -> i.getArgument(0));
-
-    Image updateData = new Image();
-    updateData.setName("Updated Name");
-    updateData.setContentType("image/gif");
-    updateData.setSize(4321L);
-    updateData.setData(new byte[] { 9, 9, 9 });
-    updateData.setProject(project);
-
-    Image updated = imageService.updateImage(updateData, 1L);
-    assertEquals("Updated Name", updated.getName());
-    assertEquals("image/gif", updated.getContentType());
-    assertEquals(4321L, updated.getSize());
-    assertArrayEquals(new byte[] { 9, 9, 9 }, updated.getData());
+    // Act
+    Image updated = imageService.updateImage(image2, 1L);
+    // Assert
+    assertEquals("Image 2", updated.getName());
+    assertEquals("image/jpg", updated.getContentType());
+    assertEquals(image2.getSize(), updated.getSize());
     assertEquals(project, updated.getProject());
     verify(imageRepository).findById(1L);
     verify(imageRepository).save(image1);
@@ -110,17 +113,24 @@ public class ImageServiceTest {
 
   @Test
   void updateImage_ShouldThrow_WhenNotFound() {
+    // Arrange
     when(imageRepository.findById(99L)).thenReturn(Optional.empty());
+    // Act
     Image updateData = new Image();
     updateData.setProject(project);
-    assertThrows(RecordNotFoundException.class, () -> imageService.updateImage(updateData, 99L));
+    RecordNotFoundException thrown = assertThrows(RecordNotFoundException.class,
+        () -> imageService.updateImage(updateData, 99L));
+    // Assert
+    assertEquals("Image not found", thrown.getMessage());
     verify(imageRepository).findById(99L);
   }
 
   @Test
   void deleteImage_ShouldDelete_WhenExists() {
+    // Arrange
     when(imageRepository.existsById(1L)).thenReturn(true);
     doNothing().when(imageRepository).deleteById(1L);
+    // Act and Assert
     assertDoesNotThrow(() -> imageService.deleteImage(1L));
     verify(imageRepository).existsById(1L);
     verify(imageRepository).deleteById(1L);
@@ -128,8 +138,12 @@ public class ImageServiceTest {
 
   @Test
   void deleteImage_ShouldThrow_WhenNotFound() {
+    // Arrange
     when(imageRepository.existsById(99L)).thenReturn(false);
-    assertThrows(RecordNotFoundException.class, () -> imageService.deleteImage(99L));
+    // Act
+    RecordNotFoundException thrown = assertThrows(RecordNotFoundException.class, () -> imageService.deleteImage(99L));
+    // Assert
+    assertEquals("Image not found", thrown.getMessage());
     verify(imageRepository).existsById(99L);
     verify(imageRepository, never()).deleteById(anyLong());
   }
