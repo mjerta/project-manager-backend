@@ -11,6 +11,10 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run Maven Tests
+        run: ./mvnw test
       - name: Deploy to Staging via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -25,12 +29,16 @@ jobs:
             cd /opt/docker-setups/maven/
             docker-compose down
             docker-compose up --build -d
-            echo "Staging deployed" >> /var/log/github-actions
+            echo "Staging deployed at $(date)" >> /var/log/github-actions
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run Maven Tests
+        run: ./mvnw test
       - name: Deploy to Production via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -45,4 +53,4 @@ jobs:
             cd /opt/docker-setups/maven/
             docker-compose down
             docker-compose up --build -d
-            echo "Production deployed" >> /var/log/github-actions
+            echo "Production deployed at $(date)" >> /var/log/github-actions
