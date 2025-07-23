@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
       - name: Run Maven Tests
         run: ./mvnw test
       - name: Deploy to Staging via SSH
@@ -37,6 +40,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
       - name: Run Maven Tests
         run: ./mvnw test
       - name: Deploy to Production via SSH
