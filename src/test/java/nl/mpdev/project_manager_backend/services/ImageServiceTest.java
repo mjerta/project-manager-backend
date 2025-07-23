@@ -45,7 +45,7 @@ public class ImageServiceTest {
     image1 = new Image();
     image1.setId(1L);
     image1.setName("Image 1");
-    image1.setContentType("image/jpeg");
+    image1.setContentType("image/jpg");
     image1.setProject(project);
     byte[] jpegBytes = Files.readAllBytes(Paths.get("src/test/java/resources/monkey.jpg"));
     image1.setData(jpegBytes);
@@ -54,9 +54,10 @@ public class ImageServiceTest {
     image2 = new Image();
     image2.setId(2L);
     image2.setName("Image 2");
-    image2.setContentType("image/png");
+    image2.setContentType("image/jpg");
     image2.setProject(project);
     byte[] jpegBytes2 = Files.readAllBytes(Paths.get("src/test/java/resources/sheep.jpg"));
+    System.out.println(jpegBytes2);
     image2.setData(jpegBytes2);
     image2.setSize(jpegBytes2.length);
   }
@@ -89,7 +90,7 @@ public class ImageServiceTest {
     when(imageRepository.findById(99L)).thenReturn(Optional.empty());
     // Act and Assert
     RecordNotFoundException thrown = assertThrows(RecordNotFoundException.class, () -> imageService.getImageById(99L));
-    assertEquals("Image nout found", thrown.getMessage());
+    assertEquals("Image not found", thrown.getMessage());
     verify(imageRepository).findById(99L);
   }
 
