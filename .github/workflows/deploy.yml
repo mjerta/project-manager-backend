@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/setup-java@v4
+        uses: actions/checkout@v4
         with:
           distribution: 'corretto'
           java-version: '21'
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/setup-java@v4
+        uses: actions/checkout@v4
         with:
           distribution: 'corretto'
           java-version: '21'
