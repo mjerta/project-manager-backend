@@ -17,7 +17,7 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
       - name: Run Maven Tests
-        run: ./mvnw test
+        run: mvn clean test
       - name: Deploy to Staging via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -44,7 +44,7 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
       - name: Run Maven Tests
-        run: ./mvnw test
+        run: mvn clean test
       - name: Deploy to Production via SSH
         uses: appleboy/ssh-action@master
         with:
