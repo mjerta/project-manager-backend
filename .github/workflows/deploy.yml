@@ -1,0 +1,66 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Amazon Corretto JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: "21"
+      - name: Run Maven Tests
+        run: mvn clean test
+      - name: Deploy to Staging via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /var/www/project-manager-backend/
+            git checkout develop
+            git pull origin develop
+            cd /opt/docker-setups/maven/
+            docker-compose down
+            docker-compose up --build -d
+            echo "Staging deployed at $(date)" >> /var/log/github-actions
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Amazon Corretto JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: "21"
+      - name: Run Maven Tests
+        run: mvn clean test
+      - name: Deploy to Production via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /var/www/project-manager-backend/
+            git checkout main
+            git pull origin main
+            cd /opt/docker-setups/maven/
+            docker-compose down
+            docker-compose up --build -d
+            echo "Production deployed at $(date)" >> /var/log/github-actions
