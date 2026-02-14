@@ -38,7 +38,7 @@ jobs:
 
             # 2. Loop: Nginx attempts to reach the backend service
             # We use the hostname 'project-manager-production' from your proxy_pass
-            until docker exec nginx-nginx-1 curl -s --head http://project-manager-production:8081 | grep "200\|401\|403\|404" > /dev/null; do
+            until docker exec nginx-nginx-1 curl -s --head http://project-manager-staging:8081 | grep "200\|401\|403\|404" > /dev/null; do
               echo "⏳ Backend (port 8081) is not responding to Nginx yet... retrying in 5s"
               sleep 5
             done
