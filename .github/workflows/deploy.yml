@@ -34,22 +34,25 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Checking Nginx readiness..."
-            RETRY_COUNT=0
-            MAX_RETRIES=15
+            echo "Waiting for Java Backend to start on port 8080..."
+                RETRY_COUNT=0
+                MAX_RETRIES=20
+                
+            # Change 'backend-container-name' to your actual app container name
             while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              # Check if nginx is running and has a PID file
-              if docker exec nginx-nginx-1 [ -f /var/run/nginx.pid ]; then
-                echo "✅ Nginx is ready! Sending reload signal..."
+              # We try to curl the health endpoint or just the port inside the container
+              if docker exec project-manager-production_1 curl -s localhost:8080 > /dev/null; then
+                echo "✅ Backend is UP! Now reloading Nginx..."
                 docker exec nginx-nginx-1 nginx -s reload
                 break
               else
                 RETRY_COUNT=$((RETRY_COUNT+1))
-                echo "⏳ Waiting for Nginx process... ($RETRY_COUNT/$MAX_RETRIES)"
-                sleep 2
+                echo "⏳ App still starting... ($RETRY_COUNT/$MAX_RETRIES)"
+                sleep 3
               fi
+              
               if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-                echo "❌ Error: Nginx failed to start within 30 seconds."
+                echo "❌ Error: Backend failed to start."
                 exit 1
               fi
             done
@@ -82,22 +85,25 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Checking Nginx readiness..."
-            RETRY_COUNT=0
-            MAX_RETRIES=15
+            echo "Waiting for Java Backend to start on port 8080..."
+                RETRY_COUNT=0
+                MAX_RETRIES=20
+                
+            # Change 'backend-container-name' to your actual app container name
             while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              # Check if nginx is running and has a PID file
-              if docker exec nginx-nginx-1 [ -f /var/run/nginx.pid ]; then
-                echo "✅ Nginx is ready! Sending reload signal..."
+              # We try to curl the health endpoint or just the port inside the container
+              if docker exec project-manager-production_1 curl -s localhost:8080 > /dev/null; then
+                echo "✅ Backend is UP! Now reloading Nginx..."
                 docker exec nginx-nginx-1 nginx -s reload
                 break
               else
                 RETRY_COUNT=$((RETRY_COUNT+1))
-                echo "⏳ Waiting for Nginx process... ($RETRY_COUNT/$MAX_RETRIES)"
-                sleep 2
+                echo "⏳ App still starting... ($RETRY_COUNT/$MAX_RETRIES)"
+                sleep 3
               fi
+              
               if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-                echo "❌ Error: Nginx failed to start within 30 seconds."
+                echo "❌ Error: Backend failed to start."
                 exit 1
               fi
             done
