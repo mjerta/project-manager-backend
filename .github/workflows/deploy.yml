@@ -34,7 +34,9 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            sleep 30
+            sleep 10
+            docker exec nginx-nginx-1 nginx -t && \
+            docker exec nginx-nginx-1 nginx -s reload
             echo "Staging deployed at $(date)" >> /var/log/github-actions
 
   deploy-production:
@@ -64,6 +66,7 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            sleep 30
+            sleep 10
+            docker exec nginx-nginx-1 nginx -t && \
             docker exec nginx-nginx-1 nginx -s reload
             echo "Production deployed at $(date)" >> /var/log/github-actions
