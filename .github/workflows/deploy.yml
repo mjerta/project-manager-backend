@@ -32,6 +32,7 @@ jobs:
             git checkout develop
             git pull origin develop
             cd /opt/docker-setups/maven/
+            docker compose down
             docker compose up --build -d
             echo "Checking Nginx readiness..."
             RETRY_COUNT=0
@@ -79,6 +80,7 @@ jobs:
             git checkout main
             git pull origin main
             cd /opt/docker-setups/maven/
+            docker compose down
             docker compose up --build -d
             echo "Checking Nginx readiness..."
             RETRY_COUNT=0
