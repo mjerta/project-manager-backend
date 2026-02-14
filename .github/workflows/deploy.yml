@@ -33,7 +33,7 @@ jobs:
             git pull origin develop
             cd /opt/docker-setups/maven/
             docker compose down
-            docker compose up --build -d
+            docker compose up --build -d --remove-orphans
             sleep 10
             docker exec nginx-nginx-1 nginx -t && \
             docker exec nginx-nginx-1 nginx -s reload
@@ -63,9 +63,9 @@ jobs:
             cd /var/www/project-manager-backend/
             git checkout main
             git pull origin main
-            cd /opt/docker-setups/maven/
+            cd /opt/docker-setups/maven
             docker compose down
-            docker compose up --build -d
+            docker compose up --build -d --remove-orphans
             sleep 10
             docker exec nginx-nginx-1 nginx -t && \
             docker exec nginx-nginx-1 nginx -s reload
