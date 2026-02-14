@@ -32,6 +32,7 @@ jobs:
             git checkout develop
             git pull origin develop
             cd /opt/docker-setups/maven/
+            docker compose down
             docker compose up --build -d && docker exec nginx_nginx_1 nginx -s reload
             echo "Staging deployed at $(date)" >> /var/log/github-actions
 
@@ -60,5 +61,6 @@ jobs:
             git checkout main
             git pull origin main
             cd /opt/docker-setups/maven/
+            docker-compose down
             docker compose up --build -d && docker exec nginx_nginx_1 nginx -s reload
             echo "Production deployed at $(date)" >> /var/log/github-actions
