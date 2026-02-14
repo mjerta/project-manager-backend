@@ -34,24 +34,18 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Waiting for Java Backend to start on port 8080..."
-                RETRY_COUNT=0
-                MAX_RETRIES=20
-                
-            echo "Waiting for Backend to reach 'Ready' state..."
+            echo "Checking connectivity from Nginx to Backend..."
 
-            # 2. Wait until the backend responds to a request
-            # Replace 'project-manager-production_1' with your actual backend container name
-            # Replace '8080' with your app's internal port
-            until docker exec project-manager-production_1 curl -s --head  --request GET http://localhost:8080 | grep "200\|401\|403" > /dev/null; do
-              echo "⏳ Backend is still initializing... (this usually takes 20-40s for Java)"
+            # 2. Loop: Nginx attempts to reach the backend service
+            # We use the hostname 'project-manager-production' from your proxy_pass
+            until docker exec nginx-nginx-1 curl -s --head http://project-manager-production:8081 | grep "200\|401\|403\|404" > /dev/null; do
+              echo "⏳ Backend (port 8081) is not responding to Nginx yet... retrying in 5s"
               sleep 5
             done
 
-            echo "✅ Backend is officially UP!"
+            echo "✅ Connection confirmed! Backend is responding."
 
-            # 3. Now it is safe to reload Nginx
-            echo "Reloading Nginx proxy..."
+            # 3. Final Nginx reload to sweep up the new build
             docker exec nginx-nginx-1 nginx -s reload
             echo "Staging deployed at $(date)" >> /var/log/github-actions
 
@@ -82,23 +76,17 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Waiting for Java Backend to start on port 8080..."
-                RETRY_COUNT=0
-                MAX_RETRIES=20
-                
-            echo "Waiting for Backend to reach 'Ready' state..."
+            echo "Checking connectivity from Nginx to Backend..."
 
-            # 2. Wait until the backend responds to a request
-            # Replace 'project-manager-production_1' with your actual backend container name
-            # Replace '8080' with your app's internal port
-            until docker exec project-manager-production_1 curl -s --head  --request GET http://localhost:8080 | grep "200\|401\|403" > /dev/null; do
-              echo "⏳ Backend is still initializing... (this usually takes 20-40s for Java)"
+            # 2. Loop: Nginx attempts to reach the backend service
+            # We use the hostname 'project-manager-production' from your proxy_pass
+            until docker exec nginx-nginx-1 curl -s --head http://project-manager-production:8081 | grep "200\|401\|403\|404" > /dev/null; do
+              echo "⏳ Backend (port 8081) is not responding to Nginx yet... retrying in 5s"
               sleep 5
             done
 
-            echo "✅ Backend is officially UP!"
+            echo "✅ Connection confirmed! Backend is responding."
 
-            # 3. Now it is safe to reload Nginx
-            echo "Reloading Nginx proxy..."
+            # 3. Final Nginx reload to sweep up the new build
             docker exec nginx-nginx-1 nginx -s reload
             echo "Production deployed at $(date)" >> /var/log/github-actions
