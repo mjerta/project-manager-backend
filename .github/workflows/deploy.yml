@@ -33,8 +33,25 @@ jobs:
             git pull origin develop
             cd /opt/docker-setups/maven/
             docker compose up --build -d
-            sleep 2
-            docker exec nginx-nginx-1 nginx -s reload
+            echo "Checking Nginx readiness..."
+            RETRY_COUNT=0
+            MAX_RETRIES=15
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              # Check if nginx is running and has a PID file
+              if docker exec nginx-nginx-1 [ -f /var/run/nginx.pid ]; then
+                echo "✅ Nginx is ready! Sending reload signal..."
+                docker exec nginx-nginx-1 nginx -s reload
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT+1))
+                echo "⏳ Waiting for Nginx process... ($RETRY_COUNT/$MAX_RETRIES)"
+                sleep 2
+              fi
+              if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+                echo "❌ Error: Nginx failed to start within 30 seconds."
+                exit 1
+              fi
+            done
             echo "Staging deployed at $(date)" >> /var/log/github-actions
 
   deploy-production:
@@ -63,6 +80,23 @@ jobs:
             git pull origin main
             cd /opt/docker-setups/maven/
             docker compose up --build -d
-            sleep 2
-            docker exec nginx-nginx-1 nginx -s reload
+            echo "Checking Nginx readiness..."
+            RETRY_COUNT=0
+            MAX_RETRIES=15
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              # Check if nginx is running and has a PID file
+              if docker exec nginx-nginx-1 [ -f /var/run/nginx.pid ]; then
+                echo "✅ Nginx is ready! Sending reload signal..."
+                docker exec nginx-nginx-1 nginx -s reload
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT+1))
+                echo "⏳ Waiting for Nginx process... ($RETRY_COUNT/$MAX_RETRIES)"
+                sleep 2
+              fi
+              if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+                echo "❌ Error: Nginx failed to start within 30 seconds."
+                exit 1
+              fi
+            done
             echo "Production deployed at $(date)" >> /var/log/github-actions
