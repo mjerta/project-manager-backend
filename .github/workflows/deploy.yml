@@ -34,19 +34,7 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Checking connectivity from Nginx to Backend..."
-
-            # 2. Loop: Nginx attempts to reach the backend service
-            # We use the hostname 'project-manager-production' from your proxy_pass
-            until docker exec nginx-nginx-1 curl -s --head http://project-manager-staging:8080 | grep "200\|401\|403\|404" > /dev/null; do
-              echo "⏳ Backend (port 8081) is not responding to Nginx yet... retrying in 5s"
-              sleep 5
-            done
-
-            echo "✅ Connection confirmed! Backend is responding."
-
-            # 3. Final Nginx reload to sweep up the new build
-            docker exec nginx-nginx-1 nginx -s reload
+            sleep 30
             echo "Staging deployed at $(date)" >> /var/log/github-actions
 
   deploy-production:
@@ -76,17 +64,6 @@ jobs:
             cd /opt/docker-setups/maven/
             docker compose down
             docker compose up --build -d
-            echo "Checking connectivity from Nginx to Backend..."
-
-            # 2. Loop: Nginx attempts to reach the backend service
-            # We use the hostname 'project-manager-production' from your proxy_pass
-            until docker exec nginx-nginx-1 curl -s --head http://project-manager-production:8081 | grep "200\|401\|403\|404" > /dev/null; do
-              echo "⏳ Backend (port 8081) is not responding to Nginx yet... retrying in 5s"
-              sleep 5
-            done
-
-            echo "✅ Connection confirmed! Backend is responding."
-
-            # 3. Final Nginx reload to sweep up the new build
+            sleep 30
             docker exec nginx-nginx-1 nginx -s reload
             echo "Production deployed at $(date)" >> /var/log/github-actions
