@@ -19,7 +19,7 @@ FROM amazoncorretto:21
 WORKDIR /app
 
 # Copy the JAR file from the build stage
-COPY --from=build /app/target/project-manager-backend-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 # Command to run the JAR file
 ENTRYPOINT ["java", "-jar", "app.jar"]
