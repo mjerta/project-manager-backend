@@ -13,37 +13,31 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
-      # Step 1: Get Short SHA for Staging
-      - name: Set Short SHA
-        id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
+      - name: Set up Amazon Corretto JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: "21"
       - name: Run Maven Tests
         run: mvn clean test
-
       - name: Deploy to Staging via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             cd /var/www/project-manager-backend/
             git checkout develop
             git pull origin develop
             cd /opt/docker-setups/maven/
-            
-            # Use the Short SHA as the version
-            export APP_VERSION=${{ steps.vars.outputs.sha_short }}
-            
             docker compose down
-            # Pass the version to Docker Compose
-            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans
-            
+            docker compose up --build -d --remove-orphans
             sleep 10
-            docker exec nginx-nginx-1 nginx -t && docker exec nginx-nginx-1 nginx -s reload
-            echo "Staging deployed [Version: $APP_VERSION] at $(date)" >> /var/log/github-actions
+            docker exec nginx-nginx-1 nginx -t && \
+            docker exec nginx-nginx-1 nginx -s reload
+            echo "Staging deployed at $(date)" >> /var/log/github-actions
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
@@ -51,38 +45,28 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+      - name: Set up Amazon Corretto JDK 21
+        uses: actions/setup-java@v4
         with:
-          fetch-depth: 0 # Important: Fetch all history for tagging
-
-      # Step 2: Auto-calculate Semantic Version (v1.0.1, etc)
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: patch
-
+          distribution: "corretto"
+          java-version: "21"
       - name: Run Maven Tests
         run: mvn clean test
-
       - name: Deploy to Production via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             cd /var/www/project-manager-backend/
             git checkout main
             git pull origin main
-            cd /opt/docker-setups/maven/
-            
-            # Use the new Semantic Tag as the version
-            export APP_VERSION=${{ steps.tag_version.outputs.new_tag }}
-            
+            cd /opt/docker-setups/maven
             docker compose down
-            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans
-            
+            docker compose up --build -d --remove-orphans
             sleep 10
-            docker exec nginx-nginx-1 nginx -t && docker exec nginx-nginx-1 nginx -s reload
-            echo "Production deployed [Version: $APP_VERSION] at $(date)" >> /var/log/github-actions
+            docker exec nginx-nginx-1 nginx -t && \
+            docker exec nginx-nginx-1 nginx -s reload
+            echo "Production deployed at $(date)" >> /var/log/github-actions
