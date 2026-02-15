@@ -42,8 +42,7 @@ jobs:
             
             export APP_VERSION=${{ steps.vars.outputs.sha_short }}
             
-            docker compose down
-            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans
+            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans project-manager-staging
             
             sleep 10
             docker exec nginx-nginx-1 nginx -t && docker exec nginx-nginx-1 nginx -s reload
@@ -89,8 +88,7 @@ jobs:
             
             export APP_VERSION=${{ steps.tag_version.outputs.new_tag }}
             
-            docker compose down
-            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans
+            APP_VERSION=$APP_VERSION docker compose up --build -d --remove-orphans project-manager-production
             
             sleep 10
             docker exec nginx-nginx-1 nginx -t && docker exec nginx-nginx-1 nginx -s reload
