@@ -57,7 +57,6 @@ jobs:
         with:
           fetch-depth: 0
 
-
       - name: Set up Amazon Corretto JDK 21
         uses: actions/setup-java@v4
         with:
