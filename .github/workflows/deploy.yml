@@ -73,7 +73,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: patch
           fetch_all_tags: true
-          custom_release_rules: feature:minor,feat:minor,fix:patch
+          custom_release_rules: |
+            breaking:major,
+            feature:minor,
+            feat:minor,
+            fix:patch,
+            perf:patch
 
       - name: Create a GitHub Release
         uses: softprops/action-gh-release@v2
