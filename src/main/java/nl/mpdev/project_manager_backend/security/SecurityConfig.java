@@ -2,6 +2,7 @@ package nl.mpdev.project_manager_backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -45,14 +46,12 @@ public class SecurityConfig {
       objectMapper.writeValue(response.getWriter(), Map.of("accessToken", token));
     };
 
-    // TODO: Somehow explicetly calling login still does not work properly
     http
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // .requestMatchers("/login/**", "/oauth2/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "api/v1/status").authenticated()
-            .anyRequest().permitAll())
+            // .requestMatchers(HttpMethod.GET, "api/v1/status").authenticated()
+            .anyRequest().authenticated())
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/oauth2/authorization/google")
             .successHandler(successHandler))
@@ -63,7 +62,9 @@ public class SecurityConfig {
 
   @Bean
   public JwtDecoder jwtDecoder() {
-    SecretKey spec = new SecretKeySpec(this.SECRETKEY.getBytes(), "HmacSHA256");
+    byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(this.SECRETKEY);
+
+    SecretKey spec = new SecretKeySpec(keyBytes, "HmacSHA256");
     return NimbusJwtDecoder.withSecretKey(spec).build();
   }
 }

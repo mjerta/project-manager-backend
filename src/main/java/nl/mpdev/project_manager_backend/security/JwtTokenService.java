@@ -19,8 +19,9 @@ public class JwtTokenService {
 
   public JwtTokenService(
       @Value("${jwt.secret}") String secret,
-      @Value("${jwt.expiration-seconds:3600}") long expirationSeconds) {
-    this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+      @Value("${jwt.expiration-seconds}") long expirationSeconds) {
+    byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(secret);
+    this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     this.expirationSeconds = expirationSeconds;
   }
 
