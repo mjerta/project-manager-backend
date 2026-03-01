@@ -50,7 +50,9 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // .requestMatchers(HttpMethod.GET, "api/v1/status").authenticated()
+            .requestMatchers(HttpMethod.GET, "/login").permitAll()
+            // .requestMatchers(HttpMethod.GET, "/oauth2/authorization/google").permitAll()
+            .requestMatchers(HttpMethod.GET, "api/v1/status").permitAll()
             .anyRequest().authenticated())
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/oauth2/authorization/google")
