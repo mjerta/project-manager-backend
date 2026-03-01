@@ -1,5 +1,9 @@
 package nl.mpdev.project_manager_backend.controllers;
 
+import java.util.Map;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,4 +15,9 @@ public class AuthController {
     return "Welcome to mpdev!";
   }
 
+  @GetMapping("/user-info")
+  public Map<String, Object> getUser(@AuthenticationPrincipal OAuth2User principal) {
+    // principal.getAttributes() contains name, email, picture, etc.
+    return principal.getAttributes();
+  }
 }
