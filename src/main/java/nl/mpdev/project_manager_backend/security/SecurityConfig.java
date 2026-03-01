@@ -10,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
@@ -49,20 +50,14 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("login/**", "/oath2/**").permitAll()
-            .anyRequest().authenticated())
+            // .requestMatchers("/login/**", "/oauth2/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "api/v1/status").authenticated()
+            .anyRequest().permitAll())
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/oauth2/authorization/google")
             .successHandler(successHandler))
         .oauth2ResourceServer(oauth2 -> oauth2
-            .jwt(Customizer.withDefaults()))
-        .exceptionHandling(e -> e
-            .defaultAuthenticationEntryPointFor(
-                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                new AntPathRequestMatcher("/api/**"))
-            .defaultAuthenticationEntryPointFor(
-                new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google"),
-                new AntPathRequestMatcher("/login")));
+            .jwt(Customizer.withDefaults()));
     return http.build();
   }
 
