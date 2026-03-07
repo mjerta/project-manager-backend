@@ -9,7 +9,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
@@ -21,6 +20,7 @@ public class JwtTokenService {
 
   private final Key signingKey;
   private final long expirationSeconds;
+  private Map<String, String> googleClaims;
 
   public JwtTokenService(
       @Value("${jwt.secret}") String secret,
@@ -32,17 +32,17 @@ public class JwtTokenService {
 
   public String generateToken(Authentication authentication) {
     Instant now = Instant.now();
-    Map<String, String> googleClaims = this.extractClaims(authentication);
+    this.googleClaims = this.extractClaims(authentication);
 
     return Jwts.builder()
         .setSubject(authentication.getName())
         .setIssuedAt(Date.from(now))
         .setExpiration(Date.from(now.plusSeconds(expirationSeconds)))
         .claim("roles", "DEFAULT_USER")
-        .claim("email", googleClaims.get("email"))
-        .claim("first_name", googleClaims.get("first_name"))
-        .claim("last_name", googleClaims.get("last_name"))
-        .claim("profile_photo", googleClaims.get("profile_photo"))
+        .claim("email", this.googleClaims.get("email"))
+        .claim("first_name", this.googleClaims.get("first_name"))
+        .claim("last_name", this.googleClaims.get("last_name"))
+        .claim("profile_photo", this.googleClaims.get("profile_photo"))
         .signWith(signingKey, SignatureAlgorithm.HS256)
         .compact();
   }
@@ -51,12 +51,16 @@ public class JwtTokenService {
     Map<String, String> claims = new HashMap<>();
     Object principal = authentication.getPrincipal();
     if (principal instanceof OidcUser oidcUser) {
-      claims.put("email", oidcUser.getEmail());
-      claims.put("first_name", oidcUser.getGivenName());
-      claims.put("last_name", oidcUser.getFamilyName());
-      claims.put("profile_photo", oidcUser.getPicture());
+      claims.putIfAbsent("email", oidcUser.getEmail());
+      claims.putIfAbsent("first_name", oidcUser.getGivenName());
+      claims.putIfAbsent("last_name", oidcUser.getFamilyName());
+      claims.putIfAbsent("profile_photo", oidcUser.getPicture());
     }
     return claims;
+  }
+
+  public Map<String, String> getGoogleClaims() {
+    return googleClaims;
   }
 
 }
