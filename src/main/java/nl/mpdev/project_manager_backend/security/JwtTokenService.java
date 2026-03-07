@@ -38,7 +38,7 @@ public class JwtTokenService {
         .setSubject(authentication.getName())
         .setIssuedAt(Date.from(now))
         .setExpiration(Date.from(now.plusSeconds(expirationSeconds)))
-        .claim("roles", "DEFAULT_USER")
+        .claim("external_id", this.googleClaims.get("external_id"))
         .claim("email", this.googleClaims.get("email"))
         .claim("first_name", this.googleClaims.get("first_name"))
         .claim("last_name", this.googleClaims.get("last_name"))
@@ -51,6 +51,7 @@ public class JwtTokenService {
     Map<String, String> claims = new HashMap<>();
     Object principal = authentication.getPrincipal();
     if (principal instanceof OidcUser oidcUser) {
+      claims.putIfAbsent("external_id", oidcUser.getSubject());
       claims.putIfAbsent("email", oidcUser.getEmail());
       claims.putIfAbsent("first_name", oidcUser.getGivenName());
       claims.putIfAbsent("last_name", oidcUser.getFamilyName());

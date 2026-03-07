@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nl.mpdev.project_manager_backend.models.User;
+import nl.mpdev.project_manager_backend.repositories.UserRepository;
 import nl.mpdev.project_manager_backend.services.UserService;
 
 @Configuration
@@ -41,6 +43,11 @@ public class SecurityConfig {
     AuthenticationSuccessHandler successHandler = (request, response, authentication) -> {
       // TODO: Add a user here inside
       String token = jwtTokenService.generateToken(authentication);
+      Map<String, String> userClaims = jwtTokenService.getGoogleClaims();
+      userService.registerNewUser(User.builder()
+          .externalId(userClaims.get("external_id"))
+          .build());
+
       response.setStatus(HttpStatus.OK.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       objectMapper.writeValue(response.getWriter(), Map.of(
