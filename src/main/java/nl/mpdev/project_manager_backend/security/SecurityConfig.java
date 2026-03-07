@@ -2,7 +2,7 @@ package nl.mpdev.project_manager_backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -20,11 +20,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -43,7 +42,8 @@ public class SecurityConfig {
       String token = jwtTokenService.generateToken(authentication);
       response.setStatus(HttpStatus.OK.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      objectMapper.writeValue(response.getWriter(), Map.of("accessToken", token));
+      objectMapper.writeValue(response.getWriter(), Map.of(
+          "accessToken", token));
     };
 
     http
@@ -51,8 +51,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/login").permitAll()
-            // .requestMatchers(HttpMethod.GET, "/oauth2/authorization/google").permitAll()
-            .requestMatchers(HttpMethod.GET, "api/v1/status").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/status").permitAll()
             .anyRequest().authenticated())
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/oauth2/authorization/google")
@@ -69,4 +68,5 @@ public class SecurityConfig {
     SecretKey spec = new SecretKeySpec(keyBytes, "HmacSHA256");
     return NimbusJwtDecoder.withSecretKey(spec).build();
   }
+
 }
