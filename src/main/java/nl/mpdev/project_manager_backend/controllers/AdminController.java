@@ -1,5 +1,7 @@
 package nl.mpdev.project_manager_backend.controllers;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
   @GetMapping("/admin")
-  String getTest() {
-    return "This is for admins";
+  Map<String, String> getTest() {
+    return Map.of("message", "admin message");
   }
 }
