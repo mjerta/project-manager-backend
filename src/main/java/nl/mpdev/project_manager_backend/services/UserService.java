@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import nl.mpdev.project_manager_backend.models.Authority;
@@ -14,9 +15,11 @@ import nl.mpdev.project_manager_backend.repositories.UserRepository;
 @Service
 public class UserService {
   private final UserRepository userRepository;
+  private final String adminEmail;
 
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, @Value("${app.admin.email}") String adminEmail) {
     this.userRepository = userRepository;
+    this.adminEmail = adminEmail;
   }
 
   public User registerNewUser(User entity) {
@@ -26,7 +29,11 @@ public class UserService {
     }
     // DEFAULT USER
     Set<Authority> authorities = new HashSet<>();
-    authorities.add(authorityBuilder.authority("DEFAULT_USER").build());
+    if (entity.getEmail() != null && entity.getEmail().equalsIgnoreCase(adminEmail)) {
+      authorities.add(authorityBuilder.authority("ADMIN").build());
+    } else {
+      authorities.add(authorityBuilder.authority("DEFAULT_USER").build());
+    }
 
     entity = entity.toBuilder()
         .authorities(authorities)
