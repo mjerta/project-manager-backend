@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -36,17 +37,17 @@ public class JwtTokenService {
   public String generateToken(Authentication authentication) {
     Instant now = Instant.now();
     this.googleClaims = this.extractClaims(authentication);
-    // TODO: I need to put the logic in here of creating user and checking for user
     if (this.userService.checkIfUserExist(googleClaims.get("email"))) {
-
       this.userService.registerNewUser(User.builder()
           .externalId(this.googleClaims.get("external_id"))
           .email(this.googleClaims.get("email"))
           .firstName(this.googleClaims.get("first_name"))
           .lastName(this.googleClaims.get("last_name"))
           .profilePhoto(this.googleClaims.get("profile_photo"))
+          .lastLoginAt(now)
           .build());
     }
+    Set<String> authorities = userService.checkForRoles(this.googleClaims.get("email"));
 
     return Jwts.builder()
         .setSubject(authentication.getName())
@@ -57,6 +58,7 @@ public class JwtTokenService {
         .claim("first_name", this.googleClaims.get("first_name"))
         .claim("last_name", this.googleClaims.get("last_name"))
         .claim("profile_photo", this.googleClaims.get("profile_photo"))
+        .claim("authorities", authorities)
         .signWith(signingKey, SignatureAlgorithm.HS256)
         .compact();
   }

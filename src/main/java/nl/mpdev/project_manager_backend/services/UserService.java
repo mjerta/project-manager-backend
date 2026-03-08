@@ -1,11 +1,12 @@
 package nl.mpdev.project_manager_backend.services;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import nl.mpdev.project_manager_backend.exceptions.GeneralException;
 import nl.mpdev.project_manager_backend.models.Authority;
 import nl.mpdev.project_manager_backend.models.User;
 import nl.mpdev.project_manager_backend.repositories.UserRepository;
@@ -38,10 +39,18 @@ public class UserService {
   public boolean checkIfUserExist(String email) {
     if (userRepository.findByEmail(email).isPresent()) {
       System.out.println("this is already found");
-      // throw new GeneralException("User with email " + entity.getEmail() + " already
-      // exists");
       return false;
     }
     return true;
+  }
+
+  public Set<String> checkForRoles(String email) {
+    return userRepository.findByEmail(email)
+        .map(User::getAuthorities)
+        .filter(authorities -> !authorities.isEmpty())
+        .map(authorities -> authorities.stream()
+            .map(Authority::getAuthority)
+            .collect(Collectors.toSet()))
+        .orElseGet(() -> Collections.singleton("DEFAULT_USER"));
   }
 }

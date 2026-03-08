@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,8 @@ public class User {
   @Column(name = "profile_photo", length = 512)
   private String profilePhoto;
 
-  @OneToMany(mappedBy = "username", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "username", referencedColumnName = "email")
   private Set<Authority> authorities = new HashSet<>();
 
   @Column(name = "last_login_at")
