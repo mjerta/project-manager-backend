@@ -20,8 +20,9 @@ import lombok.NoArgsConstructor;
 public class Authority implements GrantedAuthority {
   @Id
   @Column(nullable = false)
-  private String user;
+  private String username;
   @Id
   @Column(nullable = false)
   private String authority;
+
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import nl.mpdev.project_manager_backend.models.User;
+import nl.mpdev.project_manager_backend.services.UserService;
 
 @Service
 public class JwtTokenService {
@@ -21,10 +23,11 @@ public class JwtTokenService {
   private final Key signingKey;
   private final long expirationSeconds;
   private Map<String, String> googleClaims;
+  private final UserService userService;
 
-  public JwtTokenService(
-      @Value("${jwt.secret}") String secret,
-      @Value("${jwt.expiration-seconds}") long expirationSeconds) {
+  public JwtTokenService(@Value("${jwt.secret}") String secret,
+      @Value("${jwt.expiration-seconds}") long expirationSeconds, UserService userService) {
+    this.userService = userService;
     byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(secret);
     this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     this.expirationSeconds = expirationSeconds;
@@ -33,6 +36,17 @@ public class JwtTokenService {
   public String generateToken(Authentication authentication) {
     Instant now = Instant.now();
     this.googleClaims = this.extractClaims(authentication);
+    // TODO: I need to put the logic in here of creating user and checking for user
+    if (this.userService.checkIfUserExist(googleClaims.get("email"))) {
+
+      this.userService.registerNewUser(User.builder()
+          .externalId(this.googleClaims.get("external_id"))
+          .email(this.googleClaims.get("email"))
+          .firstName(this.googleClaims.get("first_name"))
+          .lastName(this.googleClaims.get("last_name"))
+          .profilePhoto(this.googleClaims.get("profile_photo"))
+          .build());
+    }
 
     return Jwts.builder()
         .setSubject(authentication.getName())

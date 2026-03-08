@@ -13,10 +13,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Builder(toBuilder = true)
@@ -24,6 +26,8 @@ import lombok.ToString;
 @Getter
 @ToString(exclude = "authorities")
 @EqualsAndHashCode(exclude = "authorities")
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -47,7 +51,7 @@ public class User {
   @Column(name = "profile_photo", length = 512)
   private String profilePhoto;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "username", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private Set<Authority> authorities = new HashSet<>();
 
   @Column(name = "last_login_at")

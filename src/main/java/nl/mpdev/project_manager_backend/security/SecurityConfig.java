@@ -22,10 +22,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.mpdev.project_manager_backend.models.User;
-import nl.mpdev.project_manager_backend.repositories.UserRepository;
-import nl.mpdev.project_manager_backend.services.UserService;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -37,16 +33,10 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       JwtTokenService jwtTokenService,
-      ObjectMapper objectMapper,
-      UserService userService) throws Exception {
+      ObjectMapper objectMapper) throws Exception {
 
     AuthenticationSuccessHandler successHandler = (request, response, authentication) -> {
-      // TODO: Add a user here inside
       String token = jwtTokenService.generateToken(authentication);
-      Map<String, String> userClaims = jwtTokenService.getGoogleClaims();
-      userService.registerNewUser(User.builder()
-          .externalId(userClaims.get("external_id"))
-          .build());
 
       response.setStatus(HttpStatus.OK.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -60,7 +50,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/login").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/status").permitAll()
-            .anyRequest().denyAll())
+            .anyRequest().permitAll())
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/login")
             .successHandler(successHandler))

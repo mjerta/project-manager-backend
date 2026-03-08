@@ -19,25 +19,29 @@ public class UserService {
   }
 
   public User registerNewUser(User entity) {
-    checkIfUserExist(entity);
     Authority.AuthorityBuilder authorityBuilder = Authority.builder();
     if (entity.getEmail() != null) {
-      authorityBuilder.user(entity.getEmail());
+      authorityBuilder.username(entity.getEmail());
     }
     // DEFAULT USER
     Set<Authority> authorities = new HashSet<>();
-    authorities.add(authorityBuilder.authority("ROLE_USER").build());
+    authorities.add(authorityBuilder.authority("DEFAULT_USER").build());
 
     entity = entity.toBuilder()
         .authorities(authorities)
         .build();
 
     return userRepository.save(entity);
+
   }
 
-  private void checkIfUserExist(User entity) {
-    if (userRepository.findByEmail(entity.getEmail()).isPresent()) {
-      throw new GeneralException("User with email " + entity.getEmail() + " already exists");
+  public boolean checkIfUserExist(String email) {
+    if (userRepository.findByEmail(email).isPresent()) {
+      System.out.println("this is already found");
+      // throw new GeneralException("User with email " + entity.getEmail() + " already
+      // exists");
+      return false;
     }
+    return true;
   }
 }
