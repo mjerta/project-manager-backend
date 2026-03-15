@@ -18,9 +18,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -49,7 +47,8 @@ public class SecurityConfig {
     AuthenticationSuccessHandler successHandler = (request, response, authentication) -> {
       String token = jwtTokenService.generateToken(authentication);
       HttpSession session = request.getSession(false);
-      boolean testUiLogin = session != null && Boolean.TRUE.equals(session.getAttribute(TestUiLoginConstants.TEST_UI_LOGIN_ATTR));
+      boolean testUiLogin = session != null
+          && Boolean.TRUE.equals(session.getAttribute(TestUiLoginConstants.TEST_UI_LOGIN_ATTR));
       if (testUiLogin && session != null) {
         session.removeAttribute(TestUiLoginConstants.TEST_UI_LOGIN_ATTR);
         response.setStatus(HttpStatus.OK.value());
