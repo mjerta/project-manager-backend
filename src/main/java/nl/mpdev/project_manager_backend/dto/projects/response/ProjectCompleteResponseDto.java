@@ -9,6 +9,5 @@ public class ProjectCompleteResponseDto {
   private Long id;
   private String title;
   private String description;
-  private String status;
   private List<URI> imageLinks;
 }
