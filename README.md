@@ -4,13 +4,13 @@ A single-user project management dashboard built with Java Spring Boot backend.
 
 ## Functional requirements
 - The system must allow the admin to log in securely. (Try to add OAuth as well)
-- The admin must be able to create new projects with a title, description, and status.
+- The admin must be able to create new projects with a title, description, and publish flag.
 - The admin must be able to update project details.
 - The admin must be able to delete projects.
 - The admin must be able to set projects as published or unpublished.
 - The system must display a list of all projects.
 - The system must fetch and display the last commit message from GitHub/Gitlab/ bare branch. (future)
-- The system must allow filtering of projects by status (e.g., In Progress, Completed, Published, Unpublished).
+- The system must allow filtering of tasks by status (e.g., To Do, In Progress, Blocked, Completed).
 - The system must allow uploading and displaying an image for each project.
 - This Micro-service should be agnostic for whatever it is being called by.
 
@@ -24,10 +24,16 @@ A single-user project management dashboard built with Java Spring Boot backend.
 ## Technical overview
 
 ### Project Management
-- Create and edit projects (title, description, status)
+- Create and edit projects (title, description, publish flag)
 - Publish/unpublish functionality
+- Manage task backlogs with per-task status tracking
 - GitHub integration for latest commit messages
 - Project image display
+
+### User & Access Control
+- Persist a `User` entity for authentication
+- Map users to a collection of granted authorities/roles
+- Reuse authorities across users for simplified role management
 
 ### Backend
 - Java Spring Boot
@@ -57,7 +63,7 @@ classDiagram
         +Long id
         +String title
         +String description
-        +Long statusId
+        +Boolean published
     }
 
     class Task {
@@ -80,9 +86,20 @@ classDiagram
         +Long projectId
     }
 
-    Project "1" --> "1" Status
+    class User {
+        +Long id
+        +String username
+        +String password
+        +String email
+    }
+
+    class Authority {
+        +Long id
+        +String name
+    }
+
     Task "1" --> "1" Status
     Project "1" --> "0..*" Task : contains
     Project "1" --> "0..*" Image
+    User "1" --> "0..*" Authority : granted
 ```
-
