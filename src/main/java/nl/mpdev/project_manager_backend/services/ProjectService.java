@@ -33,7 +33,6 @@ public class ProjectService {
     Project existingProject = projectRepository.findById(id)
         .orElseThrow(() -> new RecordNotFoundException("Project not found"));
     existingProject.setTitle(requestUpdateProject.getTitle());
-    existingProject.setStatus(requestUpdateProject.getStatus());
     existingProject.setDescription(requestUpdateProject.getDescription());
     return existingProject;
   } 
