@@ -19,7 +19,7 @@ public class Task {
   private Long id;
   private String name;
   private String description;
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "project_id", referencedColumnName = "id")
   private Project project;
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
