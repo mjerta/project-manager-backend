@@ -36,8 +36,6 @@ public class ProjectController {
 
   @PostMapping("/projects")
   public ResponseEntity<ProjectCompleteResponseDto> addProject(@RequestBody ProjectCompleteRequestDto request) {
-    System.out.println("test");
-    System.out.println(request.getStatusId());
     Project addedProject = projectService.addProject(projectsMapper.toEntity(request));
     return ResponseEntity.status(HttpStatus.CREATED).body(projectsMapper.toDto(addedProject));
   }
