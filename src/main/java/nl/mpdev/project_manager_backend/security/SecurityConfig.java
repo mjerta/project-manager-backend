@@ -1,6 +1,7 @@
 package nl.mpdev.project_manager_backend.security;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,8 +23,17 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,20 +71,31 @@ public class SecurityConfig {
       }
     };
 
+    LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> entryPoints = new LinkedHashMap<>();
+    entryPoints.put(new AntPathRequestMatcher("/api/**"), new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+    DelegatingAuthenticationEntryPoint delegatingEntryPoint = new DelegatingAuthenticationEntryPoint(entryPoints);
+    delegatingEntryPoint.setDefaultEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+
     http
         .csrf(csrf -> csrf.disable())
+        .cors(cors -> {
+        })
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/login").permitAll()
             .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
             .requestMatchers("/api/v1/images/**").hasAuthority("ADMIN")
             .requestMatchers("/api/v1/projects/**").hasAuthority("ADMIN")
+            .requestMatchers("/api/v1/tasks/**").hasAuthority("ADMIN")
             .requestMatchers("/api/v1/status/**").hasAuthority("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/api/v1/first-test").permitAll()
             .anyRequest().permitAll())
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(delegatingEntryPoint))
         .oauth2Login(oauth2 -> oauth2
             .loginPage("/login")
             .successHandler(successHandler))
         .oauth2ResourceServer(oauth2 -> oauth2
+            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
     return http.build();
@@ -108,6 +129,18 @@ public class SecurityConfig {
     byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(this.SECRETKEY);
     SecretKey spec = new SecretKeySpec(keyBytes, "HmacSHA256");
     return NimbusJwtDecoder.withSecretKey(spec).build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 
   private String buildPopupSuccessHtml(String token) {
