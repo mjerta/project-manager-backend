@@ -52,6 +52,7 @@ public class User {
   @Column(name = "profile_photo", length = 512)
   private String profilePhoto;
 
+  @Builder.Default
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   @JoinColumn(name = "username", referencedColumnName = "email")
   private Set<Authority> authorities = new HashSet<>();
