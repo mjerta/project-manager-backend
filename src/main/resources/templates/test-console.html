@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JWT Test Console</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      color-scheme: light dark;
+      font-family: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: radial-gradient(circle at 20% 20%, #1c1c1c, #0d0d0d);
+      color: #e6e6e6;
+      min-height: 100vh;
+    }
+
+    .card {
+      max-width: 960px;
+      margin: 0 auto;
+      background: rgba(18, 24, 38, 0.85);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    p {
+      color: #b5bfd5;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 12px;
+      border: 1px solid #2f3e63;
+      padding: 1rem;
+      background: rgba(7, 10, 20, 0.9);
+      color: #e6e6e6;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.6rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 0.75rem;
+      margin-top: 0.75rem;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #08111f;
+      box-shadow: 0 12px 30px rgba(0, 114, 255, 0.45);
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e6e6e6;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button:not(:disabled):hover {
+      transform: translateY(-2px);
+    }
+
+    .stack {
+      margin-top: 2rem;
+    }
+
+    .log {
+      margin-top: 1.5rem;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 16px;
+      padding: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.9rem;
+      max-height: 320px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>Manual JWT Tester</h1>
+    <p>
+      Paste a JWT issued by your OAuth flow and reuse it for protected
+      calls.
+      The token is cached in <code>localStorage</code> so each endpoint hit automatically includes it.
+    </p>
+    <div>
+      <button id="login-btn" class="primary">Login with Google</button>
+      <span class="pill">Popup opens /test-ui/login</span>
+    </div>
+
+    <section class="stack">
+      <label for="jwt-token">JWT Access Token</label>
+      <textarea id="jwt-token" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+      <div>
+        <button id="save-token" class="primary">Save Token</button>
+        <button id="clear-token" class="secondary">Clear Token</button>
+        <span class="pill">Storage key: <code th:text="${tokenStorageKey}"></code></span>
+      </div>
+    </section>
+
+    <section class="stack">
+      <h2>Endpoint Calls</h2>
+      <p>Each request adds the <code>Authorization: Bearer &lt;jwt&gt;</code> header. Use the buttons in sequence.</p>
+      <div>
+        <button id="call-admin" class="primary">Call Admin Endpoint</button>
+        <button id="call-first-test" class="secondary">Call First Test</button>
+        <button id="call-sequence" class="secondary">Admin ➜ Status sequence</button>
+      </div>
+    </section>
+
+    <section class="stack">
+      <h2>Console</h2>
+      <div id="response-log" class="log">Waiting for input…</div>
+    </section>
+  </main>
+
+  <script th:inline="javascript">
+    const STORAGE_KEY = /*[[${tokenStorageKey}]]*/ 'pm_jwt_token';
+    const ADMIN_ENDPOINT = /*[[${adminEndpoint}]]*/ '/api/v1/admin';
+    const STATUS_ENDPOINT = /*[[${statusEndpoint}]]*/ '/api/v1/status';
+    const FIRST_TEST_ENDPOINT = /*[[${firstTestEndpoint}]]*/ '/api/v1/first-test';
+
+    const tokenField = document.getElementById('jwt-token');
+    const log = document.getElementById('response-log');
+    const saveBtn = document.getElementById('save-token');
+    const clearBtn = document.getElementById('clear-token');
+    const adminBtn = document.getElementById('call-admin');
+    const firstTestBtn = document.getElementById('call-first-test');
+    const sequenceBtn = document.getElementById('call-sequence');
+    const loginBtn = document.getElementById('login-btn');
+
+    const writeLog = (message, data) => {
+      const time = new Date().toLocaleTimeString();
+      let entry = `[${time}] ${message}`;
+      if (data) {
+        entry += `\n${JSON.stringify(data, null, 2)}`;
+      }
+      log.textContent = entry + '\n\n' + log.textContent;
+    };
+
+    const loadToken = () => localStorage.getItem(STORAGE_KEY) ?? '';
+
+    const syncTokenField = () => {
+      const stored = loadToken();
+      tokenField.value = stored;
+    };
+
+    const persistToken = (token) => {
+      if (!token) {
+        alert('Provide a JWT value before saving.');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, token.trim());
+      tokenField.value = token.trim();
+      writeLog('Stored JWT token locally.');
+    };
+
+    const persistTokenSilently = (token, source = 'popup') => {
+      if (!token) {
+        writeLog(`No token received from ${source}.`);
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, token);
+      tokenField.value = token;
+      writeLog(`Stored JWT token from ${source}.`);
+    };
+
+    const clearToken = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      tokenField.value = '';
+      writeLog('Cleared stored JWT token.');
+    };
+
+    const withAuth = () => {
+      const token = loadToken();
+      if (!token) {
+        alert('JWT token missing. Save a token first.');
+        throw new Error('missing token');
+      }
+      return `Bearer ${token}`;
+    };
+
+    const callEndpoint = async (url) => {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': withAuth(),
+            'Accept': 'application/json'
+          }
+        });
+
+        const contentType = response.headers.get('content-type') ?? '';
+        const body = contentType.includes('application/json') ? await response.json() : await response.text();
+        writeLog(`${response.status} ${response.statusText} -> ${url}`, body);
+      } catch (error) {
+        if (error.message === 'missing token') {
+          return;
+        }
+        writeLog(`Request failed for ${url}`, {error: error.message});
+      }
+    };
+
+    const runSequence = async () => {
+      sequenceBtn.disabled = true;
+      adminBtn.disabled = true;
+      try {
+        await callEndpoint(ADMIN_ENDPOINT);
+        await callEndpoint(STATUS_ENDPOINT);
+      } finally {
+        sequenceBtn.disabled = false;
+        adminBtn.disabled = false;
+      }
+    };
+
+    const handlePopupMessage = (event) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+      const {token} = event.data || {};
+      if (token) {
+        persistTokenSilently(token, 'login popup');
+      }
+    };
+
+    const handleStorageEvent = (event) => {
+      if (event.key === STORAGE_KEY) {
+        syncTokenField();
+        if (event.newValue) {
+          writeLog('Detected JWT token update from another window.');
+        } else {
+          writeLog('Token removed from another window.');
+        }
+      }
+    };
+
+    const init = () => {
+      const stored = loadToken();
+      if (stored) {
+        tokenField.value = stored;
+        writeLog('Loaded JWT token from localStorage.');
+      }
+
+      window.addEventListener('message', handlePopupMessage);
+      window.addEventListener('storage', handleStorageEvent);
+      loginBtn.addEventListener('click', () => {
+        const popup = window.open('/test-ui/login', 'oauthLogin', 'width=480,height=680,menubar=no,toolbar=no');
+        if (!popup) {
+          alert('Popup blocked. Please allow popups for this site.');
+        }
+      });
+      saveBtn.addEventListener('click', () => persistToken(tokenField.value));
+      clearBtn.addEventListener('click', clearToken);
+      adminBtn.addEventListener('click', () => callEndpoint(ADMIN_ENDPOINT));
+      firstTestBtn.addEventListener('click', () => callEndpoint(FIRST_TEST_ENDPOINT));
+      sequenceBtn.addEventListener('click', runSequence);
+    };
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+
+</html>
