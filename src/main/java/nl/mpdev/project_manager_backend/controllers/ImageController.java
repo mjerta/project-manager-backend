@@ -6,7 +6,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,7 +25,6 @@ import nl.mpdev.project_manager_backend.models.Image;
 import nl.mpdev.project_manager_backend.services.ImageService;;
 
 @RestController
-@CrossOrigin(value = "http://localhost:5173")
 @RequestMapping("/api/v1")
 public class ImageController {
 
