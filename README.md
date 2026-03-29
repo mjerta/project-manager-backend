@@ -98,7 +98,7 @@ classDiagram
         +String name
     }
 
-    Task "1" --> "1" Status
+    Task "0..*" --> "1" Status
     Project "1" --> "0..*" Task : contains
     Project "1" --> "0..*" Image
     User "1" --> "0..*" Authority : granted
