@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
 import nl.mpdev.project_manager_backend.models.Project;
-import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.repositories.ProjectRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,26 +30,18 @@ public class ProjectServiceTest {
 
   private Project project1;
   private Project project2;
-  private Status status;
 
   @BeforeEach
   void setUp() {
-    status = new Status();
-    status.setId(1L);
-    status.setName("Open");
-    status.setDescription("A project status");
-
     project1 = new Project();
     project1.setId(1L);
     project1.setTitle("Project 1");
     project1.setDescription("Description 1");
-    project1.setStatus(status);
 
     project2 = new Project();
     project2.setId(2L);
     project2.setTitle("Project 2");
     project2.setDescription("Description 2");
-    project2.setStatus(status);
   }
 
   @Test
@@ -115,7 +106,6 @@ public class ProjectServiceTest {
     Project updateData = new Project();
     updateData.setTitle("Updated Title");
     updateData.setDescription("Updated Description");
-    updateData.setStatus(status);
 
     // Act
     Project updated = projectService.updateProject(1L, updateData);
@@ -123,7 +113,6 @@ public class ProjectServiceTest {
     // Assert
     assertEquals("Updated Title", updated.getTitle());
     assertEquals("Updated Description", updated.getDescription());
-    assertEquals(status, updated.getStatus());
     verify(projectRepository).findById(1L);
   }
 
