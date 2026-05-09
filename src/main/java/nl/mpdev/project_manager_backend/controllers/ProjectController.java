@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,6 @@ import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.services.ProjectService;
 
 @RestController
-@CrossOrigin(value = "http://localhost:5173")
 @RequestMapping("/api/v1")
 public class ProjectController {
 
@@ -36,8 +34,6 @@ public class ProjectController {
 
   @PostMapping("/projects")
   public ResponseEntity<ProjectCompleteResponseDto> addProject(@RequestBody ProjectCompleteRequestDto request) {
-    System.out.println("test");
-    System.out.println(request.getStatusId());
     Project addedProject = projectService.addProject(projectsMapper.toEntity(request));
     return ResponseEntity.status(HttpStatus.CREATED).body(projectsMapper.toDto(addedProject));
   }
@@ -57,7 +53,8 @@ public class ProjectController {
   }
 
   @PutMapping("/projects/{id}")
-  public ResponseEntity<ProjectCompleteResponseDto> updateProject(@PathVariable Long id, @RequestBody ProjectCompleteRequestDto request) {
+  public ResponseEntity<ProjectCompleteResponseDto> updateProject(@PathVariable Long id,
+      @RequestBody ProjectCompleteRequestDto request) {
     Project updatedProject = projectService.updateProject(id, projectsMapper.toEntity(request));
     return ResponseEntity.status(HttpStatus.OK).body(projectsMapper.toDto(updatedProject));
   }

@@ -4,258 +4,1236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JWT Test Console</title>
+  <title>API Test Console</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
     :root {
-      color-scheme: light dark;
       font-family: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #e5e6f0;
+      background-color: #06070d;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      padding: 2rem;
-      background: radial-gradient(circle at 20% 20%, #1c1c1c, #0d0d0d);
-      color: #e6e6e6;
       min-height: 100vh;
+      padding: 2rem;
+      background: radial-gradient(circle at 5% 10%, rgba(0, 102, 255, 0.25), transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(0, 255, 209, 0.25), transparent 40%),
+        #05060c;
+      color: #e8ebff;
     }
 
-    .card {
-      max-width: 960px;
-      margin: 0 auto;
-      background: rgba(18, 24, 38, 0.85);
+    main.layout {
+      display: grid;
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto 3rem;
+      grid-template-columns: repeat(auto-fit, 1fr);
+    }
+
+    .panel {
+      background: rgba(10, 14, 25, 0.85);
       border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 50px rgba(6, 9, 20, 0.5);
       backdrop-filter: blur(8px);
     }
 
+    .panel.hero {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(0, 114, 255, 0.1), rgba(0, 255, 209, 0.08));
+    }
+
     h1 {
+      margin: 0 0 0.5rem;
       font-weight: 600;
-      margin-bottom: 1rem;
       letter-spacing: 0.04em;
     }
 
+    h2,
+    h3,
+    h4 {
+      margin-top: 0;
+      letter-spacing: 0.03em;
+    }
+
     p {
-      color: #b5bfd5;
+      color: #b9c1dd;
+      line-height: 1.5;
     }
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
       font-weight: 600;
+      margin-bottom: 0.35rem;
     }
 
     textarea {
       width: 100%;
-      min-height: 120px;
-      border-radius: 12px;
-      border: 1px solid #2f3e63;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(3, 7, 18, 0.95);
+      color: #e8ebff;
       padding: 1rem;
-      background: rgba(7, 10, 20, 0.9);
-      color: #e6e6e6;
+      min-height: 140px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.9rem;
       resize: vertical;
     }
 
-    button {
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(3, 7, 18, 0.9);
+      color: #e8ebff;
+      padding: 0.75rem 1.1rem;
+    }
+
+    input[type="file"] {
+      color: #c4cae6;
+    }
+
+    .btn {
       border: none;
       border-radius: 999px;
-      padding: 0.75rem 1.6rem;
-      font-size: 0.95rem;
+      padding: 0.7rem 1.6rem;
       font-weight: 600;
       cursor: pointer;
-      margin-right: 0.75rem;
-      margin-top: 0.75rem;
       transition: transform 150ms ease, box-shadow 150ms ease;
+      font-size: 0.95rem;
     }
 
-    button.primary {
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #08111f;
-      box-shadow: 0 12px 30px rgba(0, 114, 255, 0.45);
-    }
-
-    button.secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: #e6e6e6;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    button:disabled {
+    .btn:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
 
-    button:not(:disabled):hover {
-      transform: translateY(-2px);
+    .btn.primary {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #031022;
+      box-shadow: 0 12px 32px rgba(0, 114, 255, 0.45);
     }
 
-    .stack {
-      margin-top: 2rem;
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e8ebff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    .log {
-      margin-top: 1.5rem;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 16px;
-      padding: 1.25rem;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-family: "JetBrains Mono", "Fira Code", monospace;
-      font-size: 0.9rem;
-      max-height: 320px;
-      overflow: auto;
-      white-space: pre-wrap;
+    .btn.text {
+      border-radius: 10px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      color: #b9c1dd;
+    }
+
+    .btn:not(:disabled):hover {
+      transform: translateY(-1px);
+    }
+
+    .token-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .token-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
     }
 
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
       padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
       font-size: 0.85rem;
-      margin-top: 0.5rem;
+    }
+
+    .explorer {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.4rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      font-weight: 600;
+      color: #c2cae8;
+    }
+
+    .chip.active {
+      background: rgba(0, 255, 209, 0.16);
+      color: #04ffd0;
+      border-color: rgba(0, 255, 209, 0.5);
+    }
+
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 0.4rem;
+      color: white;
+    }
+
+    .endpoint-card {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.9rem 1rem;
+      background: rgba(6, 9, 20, 0.8);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      cursor: pointer;
+      transition: border 110ms ease, transform 110ms ease;
+    }
+
+    .endpoint-card:hover {
+      border-color: rgba(0, 255, 209, 0.4);
+      transform: translateX(2px);
+    }
+
+    .endpoint-card.active {
+      border-color: rgba(0, 255, 209, 0.7);
+      box-shadow: 0 10px 30px rgba(0, 255, 209, 0.15);
+    }
+
+    .endpoint-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      color: white;
+    }
+
+    .badge {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      padding: 0.2rem 0.5rem;
+      text-transform: uppercase;
+      color: #0a0d18;
+      font-weight: 600;
+      min-width: 58px;
+      text-align: center;
+    }
+
+    .badge.get {
+      background: #7cf4ff;
+    }
+
+    .badge.post {
+      background: #9ef27b;
+    }
+
+    .badge.put {
+      background: #ffd678;
+    }
+
+    .badge.delete {
+      background: #ff8892;
+    }
+
+    .badge.patch {
+      background: #d9a7ff;
+    }
+
+    .request-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .request-row {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: 140px 1fr auto;
+      align-items: center;
+    }
+
+    .request-row.single {
+      grid-template-columns: 1fr;
+    }
+
+    .path-param-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 160px;
+      color: #cfd5f2;
+    }
+
+    .path-param-inline {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .path-param-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .path-param-chip.muted {
+      border-style: dashed;
+      opacity: 0.6;
+    }
+
+    .path-param-chip input {
+      width: 80px;
+      border: none;
+      background: transparent;
+      color: #e8ebff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #b5bfd5;
+    }
+
+    .body-block {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 1rem;
+      background: rgba(3, 6, 16, 0.85);
+    }
+
+    .body-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .response-block {
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 16px;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      overflow: auto;
+      min-height: 140px;
+      max-height: none;
+      word-break: break-word;
+    }
+
+    .image-preview {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .image-preview img {
+      max-width: 180px;
+      max-height: 120px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .response-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: baseline;
+    }
+
+    .status-detail {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.85rem;
+      color: #a7b0ce;
+    }
+
+    .status-pill {
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(0, 255, 209, 0.15);
+      color: #04ffd0;
+      font-weight: 600;
+    }
+
+    .status-pill.error {
+      background: rgba(255, 136, 146, 0.2);
+      color: #ff8892;
+    }
+
+    .status-pill.neutral {
+      background: rgba(255, 255, 255, 0.08);
+      color: #d7dbf5;
+    }
+
+    .history-log {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .history-entry {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .response-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .response-columns {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 1rem;
+      }
+
+      .request-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-  <main class="card">
-    <h1>Manual JWT Tester</h1>
-    <p>
-      Paste a JWT issued by your OAuth flow and reuse it for protected
-      calls.
-      The token is cached in <code>localStorage</code> so each endpoint hit automatically includes it.
-    </p>
-    <div>
-      <button id="login-btn" class="primary">Login with Google</button>
-      <span class="pill">Popup opens /test-ui/login</span>
-    </div>
+  <main class="layout">
+    <header class="panel hero">
+      <h1>API Test Console</h1>
+      <p>Interact with every controller exposed by this backend, inspect responses, and iterate quickly without leaving
+        the browser. Provide a JWT to hit protected routes or explore the open ones immediately.</p>
+      <div class="token-actions">
+        <button id="login-btn" class="btn primary">Login with Google</button>
+        <span class="pill">Popup opens <code>/test-ui/login</code></span>
+      </div>
+    </header>
 
-    <section class="stack">
-      <label for="jwt-token">JWT Access Token</label>
-      <textarea id="jwt-token" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+    <section class="panel token-section">
       <div>
-        <button id="save-token" class="primary">Save Token</button>
-        <button id="clear-token" class="secondary">Clear Token</button>
+        <label for="jwt-token">JWT Access Token</label>
+        <textarea id="jwt-token" placeholder="eyJhbGciOi..."></textarea>
+      </div>
+      <div class="token-actions">
+        <button id="save-token" class="btn primary">Save Token</button>
+        <button id="clear-token" class="btn secondary">Clear Token</button>
         <span class="pill">Storage key: <code th:text="${tokenStorageKey}"></code></span>
       </div>
     </section>
 
-    <section class="stack">
-      <h2>Endpoint Calls</h2>
-      <p>Each request adds the <code>Authorization: Bearer &lt;jwt&gt;</code> header. Use the buttons in sequence.</p>
+    <section class="panel explorer">
       <div>
-        <button id="call-admin" class="primary">Call Admin Endpoint</button>
-        <button id="call-first-test" class="secondary">Call First Test</button>
-        <button id="call-sequence" class="secondary">Admin ➜ Status sequence</button>
+        <h3>Controllers</h3>
+        <p>Select a controller to reveal its endpoints.</p>
+        <div id="controller-list" class="chip-row"></div>
+      </div>
+      <div>
+        <h3>Endpoints</h3>
+        <p id="controller-hint">Pick a controller to get started.</p>
+        <div id="endpoint-list" class="endpoint-list"></div>
       </div>
     </section>
 
-    <section class="stack">
-      <h2>Console</h2>
-      <div id="response-log" class="log">Waiting for input…</div>
+    <section class="panel request-grid">
+      <div class="body-toolbar">
+        <div>
+          <h3 id="request-title">Request Builder</h3>
+          <p id="request-description">Choose an endpoint to auto-fill these fields.</p>
+        </div>
+        <span class="pill" id="auth-pill">Auth optional</span>
+      </div>
+
+      <div class="request-row">
+        <div>
+          <label for="request-method">Method</label>
+          <select id="request-method">
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+          </select>
+        </div>
+        <div>
+          <label for="request-url">Endpoint URL</label>
+          <input type="text" id="request-url" placeholder="/api/v1/..." />
+        </div>
+        <div id="path-params-container" class="path-param-container">
+          <label>Path Params</label>
+          <div id="path-params-inline" class="path-param-inline"></div>
+        </div>
+      </div>
+
+      <div class="switch-row">
+        <input type="checkbox" id="include-auth" checked />
+        <label for="include-auth">Include <code>Authorization: Bearer &lt;jwt&gt;</code> header</label>
+      </div>
+
+      <div id="json-body-section" class="body-block hidden">
+        <div class="body-toolbar">
+          <h4>JSON Body</h4>
+          <div class="token-actions">
+            <button id="format-json" class="btn text" type="button">Format</button>
+            <button id="reset-body" class="btn text" type="button">Use Sample</button>
+          </div>
+        </div>
+        <textarea id="json-body"></textarea>
+      </div>
+
+      <div id="form-body-section" class="body-block hidden">
+        <div class="body-toolbar">
+          <h4>Multipart Form Body</h4>
+          <span class="pill">Files stay local to your browser until sent.</span>
+        </div>
+        <div id="form-fields" class="form-grid"></div>
+      </div>
+
+      <div class="token-actions">
+        <button id="send-request" class="btn primary">Send Request</button>
+        <button id="copy-curl" class="btn secondary">Copy cURL</button>
+      </div>
+    </section>
+
+    <section class="panel response-grid">
+      <div class="response-meta">
+        <span class="status-pill" id="response-status">Waiting for request…</span>
+        <span id="response-time"></span>
+      </div>
+      <div class="status-detail" id="response-detail">—</div>
+      <div>
+        <h4>Response Headers</h4>
+        <div id="response-headers" class="response-block">—</div>
+      </div>
+      <div>
+        <h4>Response Body</h4>
+        <div id="response-body" class="response-block">—</div>
+        <div id="image-preview" class="image-preview hidden">
+          <span>Image Preview</span>
+          <img id="image-preview-img" alt="Response preview" />
+        </div>
+      </div>
+      <div class="response-columns">
+        <div>
+          <div class="response-meta">
+            <h4>Latest Success (2xx)</h4>
+            <span class="status-pill neutral" id="success-status">None yet</span>
+          </div>
+          <div class="status-detail" id="success-detail">—</div>
+          <div id="success-body" class="response-block">—</div>
+        </div>
+        <div>
+          <div class="response-meta">
+            <h4>Latest Error (4xx/5xx)</h4>
+            <span class="status-pill neutral" id="error-status">None yet</span>
+          </div>
+          <div class="status-detail" id="error-detail">—</div>
+          <div id="error-body" class="response-block">—</div>
+        </div>
+      </div>
+      <div>
+        <h4>Recent Activity</h4>
+        <div id="history-log" class="history-log"></div>
+      </div>
     </section>
   </main>
 
   <script th:inline="javascript">
     const STORAGE_KEY = /*[[${tokenStorageKey}]]*/ 'pm_jwt_token';
-    const ADMIN_ENDPOINT = /*[[${adminEndpoint}]]*/ '/api/v1/admin';
-    const STATUS_ENDPOINT = /*[[${statusEndpoint}]]*/ '/api/v1/status';
-    const FIRST_TEST_ENDPOINT = /*[[${firstTestEndpoint}]]*/ '/api/v1/first-test';
 
-    const tokenField = document.getElementById('jwt-token');
-    const log = document.getElementById('response-log');
-    const saveBtn = document.getElementById('save-token');
-    const clearBtn = document.getElementById('clear-token');
-    const adminBtn = document.getElementById('call-admin');
-    const firstTestBtn = document.getElementById('call-first-test');
-    const sequenceBtn = document.getElementById('call-sequence');
-    const loginBtn = document.getElementById('login-btn');
-
-    const writeLog = (message, data) => {
-      const time = new Date().toLocaleTimeString();
-      let entry = `[${time}] ${message}`;
-      if (data) {
-        entry += `\n${JSON.stringify(data, null, 2)}`;
+    const ENDPOINT_GROUPS = [
+      {
+        name: 'General',
+        description: 'Public test endpoints',
+        endpoints: [
+          {label: 'OAuth Redirect', method: 'GET', path: '/login', bodyType: 'none', requiresAuth: false, description: 'Redirects to the OAuth provider (opens in the same window).'}
+        ]
+      },
+      {
+        name: 'Admin',
+        description: 'Protected admin routes',
+        endpoints: [
+          {label: 'Admin Message', method: 'GET', path: '/api/v1/admin', bodyType: 'none', requiresAuth: true, description: 'Requires an admin JWT to succeed.'}
+        ]
+      },
+      {
+        name: 'Projects',
+        description: 'CRUD for projects',
+        endpoints: [
+          {label: 'Create Project', method: 'POST', path: '/api/v1/projects', bodyType: 'json', requiresAuth: true, sampleBody: {title: 'Demo project', description: 'Optional description'}, description: 'Creates a project. Title must be 3-20 characters.'},
+          {label: 'List Projects', method: 'GET', path: '/api/v1/projects', bodyType: 'none', requiresAuth: true, description: 'Returns all projects with image links.'},
+          {label: 'Get Project', method: 'GET', path: '/api/v1/projects/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Fetch a single project by id.'},
+          {label: 'Update Project', method: 'PUT', path: '/api/v1/projects/{id}', pathParams: {id: '1'}, bodyType: 'json', requiresAuth: true, sampleBody: {title: 'Updated title', description: 'Any text'}, description: 'Updates title/description for the selected id.'},
+          {label: 'Delete Project', method: 'DELETE', path: '/api/v1/projects/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Removes a project and associated images.'}
+        ]
+      },
+      {
+        name: 'Tasks',
+        description: 'Manage project tasks with statuses',
+        endpoints: [
+          {label: 'Create Task', method: 'POST', path: '/api/v1/tasks', bodyType: 'json', requiresAuth: true, sampleBody: {name: 'Design wireframes', description: 'Homepage flow', projectId: 1, statusId: 1}, description: 'Creates a task linked to an existing project and status.'},
+          {label: 'List Tasks', method: 'GET', path: '/api/v1/tasks', bodyType: 'none', requiresAuth: true, description: 'Returns all tasks with project/status details.'},
+          {label: 'Get Task', method: 'GET', path: '/api/v1/tasks/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Fetch a single task by id.'},
+          {label: 'Update Task', method: 'PUT', path: '/api/v1/tasks/{id}', pathParams: {id: '1'}, bodyType: 'json', requiresAuth: true, sampleBody: {name: 'Design wireframes', description: 'Desktop + mobile', projectId: 1, statusId: 2}, description: 'Updates task details and relations.'},
+          {label: 'Delete Task', method: 'DELETE', path: '/api/v1/tasks/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Deletes a task.'}
+        ]
+      },
+      {
+        name: 'Status',
+        description: 'Status catalogue',
+        endpoints: [
+          {label: 'Create Status', method: 'POST', path: '/api/v1/status', bodyType: 'json', requiresAuth: true, sampleBody: {name: 'In progress', description: 'Shown on project cards'}, description: 'Adds a new status row.'},
+          {label: 'List Status', method: 'GET', path: '/api/v1/status', bodyType: 'none', requiresAuth: true, description: 'Returns the available statuses.'},
+          {label: 'Get Status', method: 'GET', path: '/api/v1/status/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Fetch a specific status by id.'},
+          {label: 'Update Status', method: 'PUT', path: '/api/v1/status/{id}', pathParams: {id: '1'}, bodyType: 'json', requiresAuth: true, sampleBody: {name: 'Done', description: 'All work completed'}, description: 'Updates name/description. Supply the id in the inputs below.'},
+          {label: 'Delete Status', method: 'DELETE', path: '/api/v1/status/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Deletes a status by id.'}
+        ]
+      },
+      {
+        name: 'Images',
+        description: 'Multipart image upload/download',
+        endpoints: [
+          {
+            label: 'Upload Image',
+            method: 'POST',
+            path: '/api/v1/images',
+            bodyType: 'form-data',
+            requiresAuth: true,
+            description: 'Send multipart/form-data with name, projectId and an image file.',
+            fields: [
+              {name: 'name', label: 'Image name', type: 'text', placeholder: 'render.png', required: true},
+              {name: 'projectId', label: 'Project ID', type: 'number', placeholder: '1', required: true},
+              {name: 'image', label: 'Image File', type: 'file', required: true}
+            ]
+          },
+          {
+            label: 'Update Image',
+            method: 'PUT',
+            path: '/api/v1/images/{id}',
+            pathParams: {id: '1'},
+            bodyType: 'form-data',
+            requiresAuth: true,
+            description: 'Replace metadata and binary payload of an existing image.',
+            fields: [
+              {name: 'name', label: 'Image name', type: 'text', placeholder: 'hero.jpg', required: true},
+              {name: 'projectId', label: 'Project ID', type: 'number', placeholder: '1', required: true},
+              {name: 'image', label: 'Image File', type: 'file', required: true}
+            ]
+          },
+          {label: 'Download Image', method: 'GET', path: '/api/v1/images/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Streams the bytes with headers. Use the response headers panel to inspect metadata.'},
+          {label: 'Delete Image', method: 'DELETE', path: '/api/v1/images/{id}', pathParams: {id: '1'}, bodyType: 'none', requiresAuth: true, description: 'Removes an image by id.'}
+        ]
       }
-      log.textContent = entry + '\n\n' + log.textContent;
+    ];
+
+    const elements = {
+      tokenField: document.getElementById('jwt-token'),
+      saveBtn: document.getElementById('save-token'),
+      clearBtn: document.getElementById('clear-token'),
+      loginBtn: document.getElementById('login-btn'),
+      controllerList: document.getElementById('controller-list'),
+      endpointList: document.getElementById('endpoint-list'),
+      controllerHint: document.getElementById('controller-hint'),
+      requestTitle: document.getElementById('request-title'),
+      requestDescription: document.getElementById('request-description'),
+      authPill: document.getElementById('auth-pill'),
+      methodSelect: document.getElementById('request-method'),
+      urlInput: document.getElementById('request-url'),
+      pathParamsContainer: document.getElementById('path-params-container'),
+      pathParamsInline: document.getElementById('path-params-inline'),
+      includeAuth: document.getElementById('include-auth'),
+      jsonSection: document.getElementById('json-body-section'),
+      jsonBody: document.getElementById('json-body'),
+      formSection: document.getElementById('form-body-section'),
+      formFields: document.getElementById('form-fields'),
+      formatJsonBtn: document.getElementById('format-json'),
+      resetBodyBtn: document.getElementById('reset-body'),
+      sendBtn: document.getElementById('send-request'),
+      copyCurlBtn: document.getElementById('copy-curl'),
+      responseStatus: document.getElementById('response-status'),
+      responseTime: document.getElementById('response-time'),
+      responseDetail: document.getElementById('response-detail'),
+      responseHeaders: document.getElementById('response-headers'),
+      responseBody: document.getElementById('response-body'),
+      imagePreview: document.getElementById('image-preview'),
+      imagePreviewImg: document.getElementById('image-preview-img'),
+      historyLog: document.getElementById('history-log'),
+      successStatus: document.getElementById('success-status'),
+      successBody: document.getElementById('success-body'),
+      successDetail: document.getElementById('success-detail'),
+      errorStatus: document.getElementById('error-status'),
+      errorBody: document.getElementById('error-body'),
+      errorDetail: document.getElementById('error-detail')
+    };
+
+    const state = {
+      activeGroupIndex: null,
+      activeEndpointIndex: null,
+      pathParamValues: {},
+      imagePreviewUrl: null
     };
 
     const loadToken = () => localStorage.getItem(STORAGE_KEY) ?? '';
 
     const syncTokenField = () => {
       const stored = loadToken();
-      tokenField.value = stored;
+      if (stored) {
+        elements.tokenField.value = stored;
+      }
     };
 
     const persistToken = (token) => {
       if (!token) {
-        alert('Provide a JWT value before saving.');
+        alert('Provide a JWT before saving.');
         return;
       }
       localStorage.setItem(STORAGE_KEY, token.trim());
-      tokenField.value = token.trim();
-      writeLog('Stored JWT token locally.');
-    };
-
-    const persistTokenSilently = (token, source = 'popup') => {
-      if (!token) {
-        writeLog(`No token received from ${source}.`);
-        return;
-      }
-      localStorage.setItem(STORAGE_KEY, token);
-      tokenField.value = token;
-      writeLog(`Stored JWT token from ${source}.`);
+      elements.tokenField.value = token.trim();
+      pushHistory('Token stored locally.');
     };
 
     const clearToken = () => {
       localStorage.removeItem(STORAGE_KEY);
-      tokenField.value = '';
-      writeLog('Cleared stored JWT token.');
+      elements.tokenField.value = '';
+      pushHistory('Token cleared.');
     };
 
-    const withAuth = () => {
-      const token = loadToken();
+    const persistTokenSilently = (token, source = 'popup') => {
       if (!token) {
-        alert('JWT token missing. Save a token first.');
-        throw new Error('missing token');
+        pushHistory(`No token received from ${source}.`);
+        return;
       }
-      return `Bearer ${token}`;
+      localStorage.setItem(STORAGE_KEY, token);
+      elements.tokenField.value = token;
+      pushHistory(`Token stored from ${source}.`);
     };
 
-    const callEndpoint = async (url) => {
-      try {
-        const response = await fetch(url, {
-          headers: {
-            'Authorization': withAuth(),
-            'Accept': 'application/json'
-          }
-        });
+    const pushHistory = (message) => {
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'history-entry';
+      entry.textContent = `[${time}] ${message}`;
+      elements.historyLog.prepend(entry);
+      const maxEntries = 12;
+      while (elements.historyLog.childElementCount > maxEntries) {
+        elements.historyLog.removeChild(elements.historyLog.lastElementChild);
+      }
+    };
 
-        const contentType = response.headers.get('content-type') ?? '';
-        const body = contentType.includes('application/json') ? await response.json() : await response.text();
-        writeLog(`${response.status} ${response.statusText} -> ${url}`, body);
+    const tagClass = (target, clazz) => {
+      target.classList.remove('error', 'neutral');
+      if (clazz) {
+        target.classList.add(clazz);
+      }
+    };
+
+    const formatDetail = (statusText, asHttp = true) => {
+      if (!statusText) {
+        return '—';
+      }
+      return asHttp ? `HTTP ${statusText}` : statusText;
+    };
+
+    const updateOutcome = (type, statusText, bodyText, options = {}) => {
+      const {http = true} = options;
+      if (type === 'success') {
+        tagClass(elements.successStatus, null);
+        elements.successStatus.textContent = statusText;
+        elements.successBody.textContent = bodyText ?? '—';
+        elements.successDetail.textContent = formatDetail(statusText, http);
+      } else {
+        tagClass(elements.errorStatus, 'error');
+        elements.errorStatus.textContent = statusText;
+        elements.errorBody.textContent = bodyText ?? '—';
+        elements.errorDetail.textContent = formatDetail(statusText, http);
+      }
+    };
+
+    const normalizeUrl = (raw) => {
+      if (!raw) {
+        return window.location.origin;
+      }
+      if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        return raw;
+      }
+      if (!raw.startsWith('/')) {
+        return `${window.location.origin}/${raw}`;
+      }
+      return `${window.location.origin}${raw}`;
+    };
+
+    const setActiveGroup = (index) => {
+      state.activeGroupIndex = index;
+      state.activeEndpointIndex = null;
+      renderControllers();
+      renderEndpoints();
+      elements.requestTitle.textContent = 'Request Builder';
+      elements.requestDescription.textContent = ENDPOINT_GROUPS[index]?.description ?? 'Select an endpoint to populate these fields.';
+    };
+
+    const renderControllers = () => {
+      elements.controllerList.innerHTML = '';
+      ENDPOINT_GROUPS.forEach((group, idx) => {
+        const chip = document.createElement('button');
+        chip.className = `chip${idx === state.activeGroupIndex ? ' active' : ''}`;
+        chip.type = 'button';
+        chip.textContent = group.name;
+        chip.addEventListener('click', () => setActiveGroup(idx));
+        elements.controllerList.appendChild(chip);
+      });
+    };
+
+    const renderEndpoints = () => {
+      elements.endpointList.innerHTML = '';
+      const group = ENDPOINT_GROUPS[state.activeGroupIndex];
+      if (!group) {
+        elements.controllerHint.textContent = 'Pick a controller to list its endpoints.';
+        return;
+      }
+      elements.controllerHint.textContent = group.description;
+      group.endpoints.forEach((endpoint, idx) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `endpoint-card${idx === state.activeEndpointIndex ? ' active' : ''}`;
+
+        const badge = document.createElement('span');
+        badge.className = `badge ${endpoint.method.toLowerCase()}`;
+        badge.textContent = endpoint.method;
+
+        const meta = document.createElement('div');
+        meta.className = 'endpoint-meta';
+        const title = document.createElement('strong');
+        title.textContent = endpoint.label;
+        const path = document.createElement('small');
+        path.textContent = endpoint.path;
+        meta.append(title, path);
+
+        card.append(badge, meta);
+        card.addEventListener('click', () => selectEndpoint(idx));
+        elements.endpointList.appendChild(card);
+      });
+    };
+
+    const extractPathParams = (path) => {
+      if (!path) {
+        return [];
+      }
+      const matches = [...path.matchAll(/\{([^}]+)\}/g)];
+      return matches.map(([, name]) => name);
+    };
+
+    const configurePathParams = (path, defaults = {}, {preserveExisting = true} = {}) => {
+      const placeholders = extractPathParams(path);
+      if (!placeholders.length) {
+        elements.pathParamsInline.innerHTML = '<span class="path-param-chip muted">None</span>';
+        state.pathParamValues = {};
+        return;
+      }
+      const existing = preserveExisting ? {...state.pathParamValues} : {};
+      state.pathParamValues = {};
+      elements.pathParamsInline.innerHTML = '';
+      console.log(placeholders);
+      placeholders.forEach(name => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'path-param-chip';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `path-${name}`;
+        input.placeholder = name;
+        const initial = existing[name] ?? defaults?.[name] ?? '';
+        input.value = initial;
+        state.pathParamValues[name] = initial;
+        const label = document.createElement('span');
+        label.textContent = name;
+        wrapper.append(label, input);
+        input.addEventListener('input', (event) => {
+          state.pathParamValues[name] = event.target.value;
+        });
+        elements.pathParamsInline.appendChild(wrapper);
+      });
+    };
+
+    const applyPathParamsToUrl = (url) => {
+      if (!url) {
+        throw new Error('Provide an endpoint URL.');
+      }
+      return url.replace(/\{([^}]+)\}/g, (match, name) => {
+        const value = state.pathParamValues[name];
+        if (!value || !value.trim()) {
+          throw new Error(`Provide a value for path parameter "${name}".`);
+        }
+        return encodeURIComponent(value.trim());
+      });
+    };
+
+    const selectEndpoint = (endpointIndex) => {
+      state.activeEndpointIndex = endpointIndex;
+      renderEndpoints();
+      const endpoint = getActiveEndpoint();
+      if (!endpoint) {
+        return;
+      }
+
+      elements.requestTitle.textContent = endpoint.label;
+      elements.requestDescription.textContent = endpoint.description ?? '—';
+      elements.methodSelect.value = endpoint.method;
+      elements.urlInput.value = endpoint.path;
+      elements.includeAuth.checked = endpoint.requiresAuth !== false;
+      elements.authPill.textContent = endpoint.requiresAuth === false ? 'Auth optional' : 'Auth required';
+
+      configurePathParams(endpoint.path, endpoint.pathParams ?? {}, {preserveExisting: false});
+
+      if (endpoint.bodyType === 'json') {
+        elements.jsonSection.classList.remove('hidden');
+        elements.formSection.classList.add('hidden');
+        const sample = endpoint.sampleBody ? JSON.stringify(endpoint.sampleBody, null, 2) : '';
+        elements.jsonBody.value = sample;
+        elements.resetBodyBtn.disabled = !endpoint.sampleBody;
+      } else if (endpoint.bodyType === 'form-data') {
+        elements.formSection.classList.remove('hidden');
+        elements.jsonSection.classList.add('hidden');
+        renderFormFields(endpoint.fields ?? []);
+        elements.resetBodyBtn.disabled = true;
+      } else {
+        elements.jsonSection.classList.add('hidden');
+        elements.formSection.classList.add('hidden');
+        elements.resetBodyBtn.disabled = true;
+      }
+    };
+
+    const getActiveEndpoint = () => {
+      const group = ENDPOINT_GROUPS[state.activeGroupIndex];
+      if (!group) {
+        return null;
+      }
+      return group.endpoints[state.activeEndpointIndex] ?? null;
+    };
+
+    const renderFormFields = (fields) => {
+      elements.formFields.innerHTML = '';
+      fields.forEach(field => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-field';
+        const label = document.createElement('label');
+        label.textContent = `${field.label}${field.required ? ' *' : ''}`;
+        label.setAttribute('for', `field-${field.name}`);
+        let input;
+        if (field.type === 'file') {
+          input = document.createElement('input');
+          input.type = 'file';
+          input.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) {
+              return;
+            }
+            const nameInput = elements.formFields.querySelector('[data-field="name"]');
+            if (!nameInput) {
+              return;
+            }
+            const autoFilled = nameInput.dataset.autofilled === 'true' || !nameInput.value;
+            if (autoFilled) {
+              nameInput.value = file.name;
+              nameInput.dataset.autofilled = 'true';
+            }
+          });
+        } else {
+          input = document.createElement('input');
+          input.type = field.type === 'number' ? 'number' : 'text';
+          if (field.placeholder) {
+            input.placeholder = field.placeholder;
+          }
+          if (field.name === 'name') {
+            input.dataset.autofilled = input.value ? 'false' : 'true';
+            input.addEventListener('input', () => {
+              input.dataset.autofilled = 'false';
+            });
+          }
+        }
+        input.id = `field-${field.name}`;
+        input.dataset.field = field.name;
+        if (field.required) {
+          input.required = true;
+        }
+        wrapper.append(label, input);
+        elements.formFields.appendChild(wrapper);
+      });
+    };
+
+    const formatJsonBody = () => {
+      if (!elements.jsonBody.value.trim()) {
+        return;
+      }
+      try {
+        const parsed = JSON.parse(elements.jsonBody.value);
+        elements.jsonBody.value = JSON.stringify(parsed, null, 2);
       } catch (error) {
-        if (error.message === 'missing token') {
+        alert('Body is not valid JSON.');
+      }
+    };
+
+    const resetJsonBody = () => {
+      const endpoint = getActiveEndpoint();
+      if (endpoint?.sampleBody) {
+        elements.jsonBody.value = JSON.stringify(endpoint.sampleBody, null, 2);
+      }
+    };
+
+    const gatherFormData = (fields) => {
+      const formData = new FormData();
+      fields.forEach(field => {
+        const input = elements.formFields.querySelector(`[data-field="${field.name}"]`);
+        if (!input) {
           return;
         }
-        writeLog(`Request failed for ${url}`, {error: error.message});
+        if (field.type === 'file') {
+          if (input.files.length === 0) {
+            if (field.required) {
+              throw new Error(`Field "${field.label}" requires a file.`);
+            }
+            return;
+          }
+          formData.append(field.name, input.files[0]);
+        } else {
+          if (!input.value && field.required) {
+            throw new Error(`Field "${field.label}" is required.`);
+          }
+          if (input.value) {
+            formData.append(field.name, input.value);
+          }
+        }
+      });
+      return formData;
+    };
+
+    const buildRequestOptions = () => {
+      const endpoint = getActiveEndpoint();
+      const method = elements.methodSelect.value;
+      const headers = new Headers();
+      headers.set('Accept', 'application/json, text/plain;q=0.85, */*;q=0.3');
+      const options = {method, headers};
+
+      if (elements.includeAuth.checked) {
+        const token = loadToken();
+        if (!token) {
+          throw new Error('JWT token missing. Save a token first.');
+        }
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+
+      if (endpoint?.bodyType === 'json') {
+        const bodyText = elements.jsonBody.value.trim();
+        if (bodyText) {
+          try {
+            JSON.parse(bodyText);
+          } catch (error) {
+            throw new Error('JSON body is not valid.');
+          }
+        }
+        headers.set('Content-Type', 'application/json');
+        options.body = bodyText || '{}';
+      } else if (endpoint?.bodyType === 'form-data') {
+        const fields = endpoint.fields ?? [];
+        const formData = gatherFormData(fields);
+        options.body = formData;
+      }
+
+      return options;
+    };
+
+    const hideImagePreview = () => {
+      if (state.imagePreviewUrl) {
+        URL.revokeObjectURL(state.imagePreviewUrl);
+        state.imagePreviewUrl = null;
+      }
+      elements.imagePreview.classList.add('hidden');
+      elements.imagePreviewImg.removeAttribute('src');
+      elements.imagePreviewImg.removeAttribute('alt');
+    };
+
+    const sendRequest = async () => {
+      const url = elements.urlInput.value.trim();
+      if (!url) {
+        alert('Provide an endpoint URL.');
+        return;
+      }
+      let resolvedUrl;
+      try {
+        resolvedUrl = applyPathParamsToUrl(url);
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+      const normalizedUrl = normalizeUrl(resolvedUrl);
+      let options;
+      try {
+        options = buildRequestOptions();
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+
+      elements.sendBtn.disabled = true;
+      elements.responseStatus.textContent = 'Pending…';
+      elements.responseStatus.classList.remove('error');
+      elements.responseDetail.textContent = 'Awaiting response…';
+      const start = performance.now();
+      try {
+        const response = await fetch(normalizedUrl, options);
+        const duration = Math.round(performance.now() - start);
+        elements.responseTime.textContent = `${duration} ms`;
+        elements.responseStatus.textContent = `${response.status} ${response.statusText}`;
+        elements.responseDetail.textContent = `HTTP ${response.status} ${response.statusText}`;
+        if (!response.ok) {
+          elements.responseStatus.classList.add('error');
+        }
+        const headersObj = {};
+        response.headers.forEach((value, key) => {
+          headersObj[key] = value;
+        });
+        elements.responseHeaders.textContent = JSON.stringify(headersObj, null, 2) || '—';
+
+        const contentType = response.headers.get('content-type') ?? '';
+        let bodyText;
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          bodyText = JSON.stringify(data, null, 2);
+          elements.responseBody.textContent = bodyText;
+          hideImagePreview();
+        } else if (contentType.startsWith('image/')) {
+          const blob = await response.blob();
+          bodyText = `[Binary ${contentType} data received]`;
+          elements.responseBody.textContent = bodyText;
+          if (state.imagePreviewUrl) {
+            URL.revokeObjectURL(state.imagePreviewUrl);
+          }
+          const url = URL.createObjectURL(blob);
+          state.imagePreviewUrl = url;
+          elements.imagePreviewImg.src = url;
+          elements.imagePreviewImg.alt = `Preview of ${contentType}`;
+          elements.imagePreview.classList.remove('hidden');
+        } else {
+          bodyText = await response.text();
+          elements.responseBody.textContent = bodyText;
+          hideImagePreview();
+        }
+        pushHistory(`${options.method} ${resolvedUrl} → ${response.status}`);
+        if (response.ok) {
+          updateOutcome('success', `${response.status} ${response.statusText}`, bodyText);
+        } else {
+          updateOutcome('error', `${response.status} ${response.statusText}`, bodyText);
+        }
+      } catch (error) {
+        elements.responseStatus.textContent = `Failed: ${error.message}`;
+        elements.responseStatus.classList.add('error');
+        elements.responseBody.textContent = error.stack ?? error.message;
+        hideImagePreview();
+        elements.responseHeaders.textContent = '—';
+        elements.responseTime.textContent = '';
+        elements.responseDetail.textContent = 'No HTTP response';
+        updateOutcome('error', `Failed: ${error.message}`, error.stack ?? error.message, {http: false});
+        pushHistory(`Request failed: ${error.message}`);
+      } finally {
+        elements.sendBtn.disabled = false;
       }
     };
 
-    const runSequence = async () => {
-      sequenceBtn.disabled = true;
-      adminBtn.disabled = true;
-      try {
-        await callEndpoint(ADMIN_ENDPOINT);
-        await callEndpoint(STATUS_ENDPOINT);
-      } finally {
-        sequenceBtn.disabled = false;
-        adminBtn.disabled = false;
+    const copyCurl = () => {
+      const endpoint = getActiveEndpoint();
+      const url = elements.urlInput.value.trim();
+      if (!url) {
+        alert('Provide an endpoint URL first.');
+        return;
       }
+      let resolvedUrl;
+      try {
+        resolvedUrl = applyPathParamsToUrl(url);
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+      const normalizedUrl = normalizeUrl(resolvedUrl);
+      const headers = [];
+      if (elements.includeAuth.checked) {
+        const token = loadToken();
+        if (!token) {
+          alert('Save a token to include Authorization header.');
+          return;
+        }
+        headers.push(`-H "Authorization: Bearer ${token}"`);
+      }
+      headers.push('-H "Accept: application/json"');
+      let bodySnippet = '';
+      if (endpoint?.bodyType === 'json') {
+        const body = elements.jsonBody.value.trim() || '{}';
+        bodySnippet = `-H "Content-Type: application/json" -d '${body}'`;
+      } else if (endpoint?.bodyType === 'form-data') {
+        alert('Copying multipart form-data as cURL is not supported by this helper yet.');
+        return;
+      }
+      const command = [`curl -X ${elements.methodSelect.value}`, ...headers, bodySnippet, `"${normalizedUrl}"`]
+        .filter(Boolean)
+        .join(' ');
+      navigator.clipboard.writeText(command)
+        .then(() => pushHistory('cURL snippet copied to clipboard.'))
+        .catch(() => alert('Clipboard copy failed.'));
     };
 
     const handlePopupMessage = (event) => {
@@ -272,33 +1250,34 @@
       if (event.key === STORAGE_KEY) {
         syncTokenField();
         if (event.newValue) {
-          writeLog('Detected JWT token update from another window.');
+          pushHistory('Detected token update from another tab.');
         } else {
-          writeLog('Token removed from another window.');
+          pushHistory('Token removed from another tab.');
         }
       }
     };
 
     const init = () => {
-      const stored = loadToken();
-      if (stored) {
-        tokenField.value = stored;
-        writeLog('Loaded JWT token from localStorage.');
-      }
+      syncTokenField();
+      renderControllers();
+      setActiveGroup(0);
+      selectEndpoint(0);
 
-      window.addEventListener('message', handlePopupMessage);
-      window.addEventListener('storage', handleStorageEvent);
-      loginBtn.addEventListener('click', () => {
+      elements.saveBtn.addEventListener('click', () => persistToken(elements.tokenField.value));
+      elements.clearBtn.addEventListener('click', clearToken);
+      elements.loginBtn.addEventListener('click', () => {
         const popup = window.open('/test-ui/login', 'oauthLogin', 'width=480,height=680,menubar=no,toolbar=no');
         if (!popup) {
-          alert('Popup blocked. Please allow popups for this site.');
+          alert('Popup blocked. Allow popups for this site.');
         }
       });
-      saveBtn.addEventListener('click', () => persistToken(tokenField.value));
-      clearBtn.addEventListener('click', clearToken);
-      adminBtn.addEventListener('click', () => callEndpoint(ADMIN_ENDPOINT));
-      firstTestBtn.addEventListener('click', () => callEndpoint(FIRST_TEST_ENDPOINT));
-      sequenceBtn.addEventListener('click', runSequence);
+      elements.formatJsonBtn.addEventListener('click', formatJsonBody);
+      elements.resetBodyBtn.addEventListener('click', resetJsonBody);
+      elements.urlInput.addEventListener('input', () => configurePathParams(elements.urlInput.value, {}, {preserveExisting: true}));
+      elements.sendBtn.addEventListener('click', sendRequest);
+      elements.copyCurlBtn.addEventListener('click', copyCurl);
+      window.addEventListener('message', handlePopupMessage);
+      window.addEventListener('storage', handleStorageEvent);
     };
 
     document.addEventListener('DOMContentLoaded', init);
