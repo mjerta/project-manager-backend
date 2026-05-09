@@ -1,5 +1,11 @@
 package nl.mpdev.project_manager_backend.exceptions;
 
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +18,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionsHandler {
@@ -56,6 +58,15 @@ public class GlobalExceptionsHandler {
     // extra details about error
     error.put("error-message", ex.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<Object> handleException(MaxUploadSizeExceededException ex) {
+    Map<String, String> error = new LinkedHashMap<>();
+    error.put("error", "Payload too large");
+    error.put("error-message",
+        "Uploaded file exceeds the maximum allowed size (" + formatSize(ex.getMaxUploadSize()) + ").");
+    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
   }
 
   // @ExceptionHandler(value = BadCredentialsException.class)
@@ -106,5 +117,13 @@ public class GlobalExceptionsHandler {
     error.put("error-message", ex.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
-}
 
+  private String formatSize(long bytes) {
+    if (bytes <= 0) {
+      return "configured limit";
+    }
+    double mb = bytes / 1024d / 1024d;
+    DecimalFormat format = new DecimalFormat("0.##");
+    return format.format(mb) + " MB";
+  }
+}

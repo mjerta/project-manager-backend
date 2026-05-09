@@ -5,9 +5,7 @@ import java.io.IOException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,21 +13,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import jakarta.validation.Valid;
 import nl.mpdev.project_manager_backend.dto.images.request.ImageCompleteRequestDto;
-import nl.mpdev.project_manager_backend.models.Image;
-import nl.mpdev.project_manager_backend.services.ImageService;
+import nl.mpdev.project_manager_backend.dto.images.response.ImageByteResponseDto;
+import nl.mpdev.project_manager_backend.dto.images.response.ImageLinkResponseDto;
 import nl.mpdev.project_manager_backend.mappers.image.ImagesMapper;
-import nl.mpdev.project_manager_backend.dto.images.response.*;;
+import nl.mpdev.project_manager_backend.models.Image;
+import nl.mpdev.project_manager_backend.services.ImageService;;
 
 @RestController
-@CrossOrigin(value = "http://localhost:5173")
 @RequestMapping("/api/v1")
 public class ImageController {
 
