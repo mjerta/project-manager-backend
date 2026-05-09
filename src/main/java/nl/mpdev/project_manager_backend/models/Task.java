@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -22,7 +23,7 @@ public class Task {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "project_id", referencedColumnName = "id")
   private Project project;
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "status_id", referencedColumnName = "id")
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "status_id", referencedColumnName = "id", unique = true)
   private Status status;
 }
