@@ -5,10 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nl.mpdev.project_manager_backend.dto.tasks.request.TaskCompleteRequestDto;
 import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
-import nl.mpdev.project_manager_backend.models.Project;
-import nl.mpdev.project_manager_backend.models.Status;
 import nl.mpdev.project_manager_backend.models.Task;
 import nl.mpdev.project_manager_backend.repositories.TaskRepository;
 
@@ -16,13 +13,9 @@ import nl.mpdev.project_manager_backend.repositories.TaskRepository;
 public class TaskService {
 
   private final TaskRepository taskRepository;
-  private final ProjectService projectService;
-  private final StatusService statusService;
 
-  public TaskService(TaskRepository taskRepository, ProjectService projectService, StatusService statusService) {
+  public TaskService(TaskRepository taskRepository) {
     this.taskRepository = taskRepository;
-    this.projectService = projectService;
-    this.statusService = statusService;
   }
 
   @Transactional
@@ -42,7 +35,7 @@ public class TaskService {
   @Transactional
   public Task updateTask(Long id, Task request) {
     Task existingTask = getTaskById(id);
-    applyRequest(request);
+    applyRequest(existingTask, request);
     return existingTask;
   }
 
@@ -53,10 +46,10 @@ public class TaskService {
     taskRepository.deleteById(id);
   }
 
-  private void applyRequest(Task request) {
-    request.setName(request.getName());
-    request.setDescription(request.getDescription());
-    request.setProject(request.getProject());
-    request.setStatus(request.getStatus());
+  private void applyRequest(Task target, Task source) {
+    target.setName(source.getName());
+    target.setDescription(source.getDescription());
+    target.setProject(source.getProject());
+    target.setStatus(source.getStatus());
   }
 }
