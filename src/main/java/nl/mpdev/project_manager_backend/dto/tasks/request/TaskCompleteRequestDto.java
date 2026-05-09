@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class TaskCompleteRequestDto {
 
+  @NotNull
+  private Long id;
   @NotBlank
   @Size(min = 3, max = 60)
   private String name;
