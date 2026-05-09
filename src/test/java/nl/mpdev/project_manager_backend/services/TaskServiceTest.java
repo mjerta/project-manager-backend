@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -17,12 +16,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import nl.mpdev.project_manager_backend.dto.tasks.request.TaskCompleteRequestDto;
 import nl.mpdev.project_manager_backend.exceptions.RecordNotFoundException;
 import nl.mpdev.project_manager_backend.models.Project;
 import nl.mpdev.project_manager_backend.models.Status;
@@ -34,12 +31,6 @@ class TaskServiceTest {
 
   @Mock
   private TaskRepository taskRepository;
-
-  @Mock
-  private ProjectService projectService;
-
-  @Mock
-  private StatusService statusService;
 
   @InjectMocks
   private TaskService taskService;
@@ -59,11 +50,9 @@ class TaskServiceTest {
   }
 
   @Test
-  void createTask_ShouldPersistTaskWithResolvedRelations() {
-    TaskCompleteRequestDto request = buildRequest();
-    when(projectService.getProjectById(request.getProjectId())).thenReturn(project);
-    when(statusService.getStatusById(request.getStatusId())).thenReturn(status);
-    when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
+  void createTask_ShouldPersistTask() {
+    Task request = buildTask();
+    when(taskRepository.save(request)).thenAnswer(invocation -> {
       Task saved = invocation.getArgument(0);
       saved.setId(1L);
       return saved;
@@ -71,16 +60,11 @@ class TaskServiceTest {
 
     Task result = taskService.createTask(request);
 
-    ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
-    verify(taskRepository).save(captor.capture());
-    Task persisted = captor.getValue();
-    assertEquals("New task", persisted.getName());
-    assertEquals("Complete this", persisted.getDescription());
-    assertSame(project, persisted.getProject());
-    assertSame(status, persisted.getStatus());
-
+    verify(taskRepository).save(request);
     assertEquals(1L, result.getId());
     assertEquals("New task", result.getName());
+    assertSame(project, result.getProject());
+    assertSame(status, result.getStatus());
   }
 
   @Test
@@ -121,18 +105,25 @@ class TaskServiceTest {
     existing.setName("Old");
     existing.setDescription("Old description");
 
-    TaskCompleteRequestDto request = buildRequest();
-    when(taskRepository.findById(7L)).thenReturn(Optional.of(existing));
-    when(projectService.getProjectById(request.getProjectId())).thenReturn(project);
-    when(statusService.getStatusById(request.getStatusId())).thenReturn(status);
+    Task updateRequest = buildTask();
+    Project newProject = new Project();
+    newProject.setId(20L);
+    newProject.setTitle("Project Beta");
+    Status newStatus = new Status();
+    newStatus.setId(8L);
+    newStatus.setName("DONE");
+    updateRequest.setProject(newProject);
+    updateRequest.setStatus(newStatus);
 
-    Task updated = taskService.updateTask(7L, request);
+    when(taskRepository.findById(7L)).thenReturn(Optional.of(existing));
+
+    Task updated = taskService.updateTask(7L, updateRequest);
 
     assertSame(existing, updated);
-    assertEquals("New task", updated.getName());
-    assertEquals("Complete this", updated.getDescription());
-    assertSame(project, updated.getProject());
-    assertSame(status, updated.getStatus());
+    assertEquals(updateRequest.getName(), updated.getName());
+    assertEquals(updateRequest.getDescription(), updated.getDescription());
+    assertSame(newProject, updated.getProject());
+    assertSame(newStatus, updated.getStatus());
   }
 
   @Test
@@ -154,12 +145,12 @@ class TaskServiceTest {
     verifyNoMoreInteractions(taskRepository);
   }
 
-  private TaskCompleteRequestDto buildRequest() {
-    TaskCompleteRequestDto request = new TaskCompleteRequestDto();
-    request.setName("New task");
-    request.setDescription("Complete this");
-    request.setProjectId(10L);
-    request.setStatusId(5L);
-    return request;
+  private Task buildTask() {
+    Task task = new Task();
+    task.setName("New task");
+    task.setDescription("Complete this");
+    task.setProject(project);
+    task.setStatus(status);
+    return task;
   }
 }
