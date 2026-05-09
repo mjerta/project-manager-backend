@@ -38,7 +38,9 @@ public class TaskController {
   @PostMapping("/tasks")
   public ResponseEntity<TaskCompleteResponseDto> createTask(@Valid @RequestBody TaskCompleteRequestDto request) {
     // TODO: fix mapper and the way i like it in here and fix the repository as well
-    Task created = taskService.createTask(request);
+
+    Task created = taskService.createTask(tasksMapper.toDto(request));
+
     return ResponseEntity.status(HttpStatus.CREATED).body(tasksMapper.toDto(created));
   }
 

@@ -26,10 +26,8 @@ public class TaskService {
   }
 
   @Transactional
-  public Task createTask(TaskCompleteRequestDto request) {
-    Task task = new Task();
-    applyRequest(task, request);
-    return taskRepository.save(task);
+  public Task createTask(Task request) {
+    return taskRepository.save(request);
   }
 
   public Task getTaskById(Long id) {
@@ -42,9 +40,9 @@ public class TaskService {
   }
 
   @Transactional
-  public Task updateTask(Long id, TaskCompleteRequestDto request) {
+  public Task updateTask(Long id, Task request) {
     Task existingTask = getTaskById(id);
-    applyRequest(existingTask, request);
+    applyRequest(request);
     return existingTask;
   }
 
@@ -55,12 +53,10 @@ public class TaskService {
     taskRepository.deleteById(id);
   }
 
-  private void applyRequest(Task task, TaskCompleteRequestDto request) {
-    task.setName(request.getName());
-    task.setDescription(request.getDescription());
-    Project project = projectService.getProjectById(request.getProjectId());
-    Status status = statusService.getStatusById(request.getStatusId());
-    task.setProject(project);
-    task.setStatus(status);
+  private void applyRequest(Task request) {
+    request.setName(request.getName());
+    request.setDescription(request.getDescription());
+    request.setProject(request.getProject());
+    request.setStatus(request.getStatus());
   }
 }
