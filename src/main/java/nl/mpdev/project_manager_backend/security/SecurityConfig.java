@@ -77,6 +77,7 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/projects/**").hasAuthority("ADMIN")
             .requestMatchers("/api/v1/tasks/**").hasAuthority("ADMIN")
             .requestMatchers("/api/v1/status/**").hasAuthority("ADMIN")
+            .requestMatchers("/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/first-test").permitAll()
             .anyRequest().permitAll())
         .exceptionHandling(ex -> ex.authenticationEntryPoint(delegatingEntryPoint))
