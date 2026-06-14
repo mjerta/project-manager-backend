@@ -44,7 +44,7 @@ app:
     email: ${ADMIN_USER}
 server:
   forward-headers-strategy: framework
-  # port: ${PROJECT_MANAGER_PORT:8080}
+  port: ${PROJECT_MANAGER_PORT:8080}
 management:
   endpoints:
     web:
@@ -53,4 +53,3 @@ management:
   endpoint:
     health:
       show-details: always
-

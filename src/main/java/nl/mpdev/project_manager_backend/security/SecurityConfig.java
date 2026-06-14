@@ -37,8 +37,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.servlet.http.HttpSession;
-import nl.mpdev.project_manager_backend.config.TestUiLoginConstants;
 
 @Configuration
 @EnableWebSecurity
@@ -56,20 +54,11 @@ public class SecurityConfig {
 
     AuthenticationSuccessHandler successHandler = (request, response, authentication) -> {
       String token = jwtTokenService.generateToken(authentication);
-      HttpSession session = request.getSession(false);
-      boolean testUiLogin = session != null
-          && Boolean.TRUE.equals(session.getAttribute(TestUiLoginConstants.TEST_UI_LOGIN_ATTR));
-      if (testUiLogin && session != null) {
-        session.removeAttribute(TestUiLoginConstants.TEST_UI_LOGIN_ATTR);
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.TEXT_HTML_VALUE);
-        response.getWriter().write(buildPopupSuccessHtml(token));
-      } else {
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(response.getWriter(), Map.of("accessToken", token));
-      }
+      response.setStatus(HttpStatus.OK.value());
+      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+      objectMapper.writeValue(response.getWriter(), Map.of("accessToken", token));
     };
+
 
     LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> entryPoints = new LinkedHashMap<>();
     entryPoints.put(new AntPathRequestMatcher("/api/**"), new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
@@ -135,8 +124,9 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOriginPatterns(List.of("*"));
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
+    configuration.setAllowedMethods(List.of("*"));
+    configuration.setAllowedHeaders(List.of("*"));
+
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -144,35 +134,6 @@ public class SecurityConfig {
     return source;
   }
 
-  private String buildPopupSuccessHtml(String token) {
-    String safeToken = token
-        .replace("\\", "\\\\")
-        .replace("'", "\\'")
-        .replace("\"", "\\\"");
-    return """
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset='UTF-8'><title>Login Success</title></head>
-        <body>
-        <script>
-          (function () {
-            const token = '%s';
-            const storageKey = '%s';
-            try {
-              localStorage.setItem(storageKey, token);
-              if (window.opener) {
-                window.opener.postMessage({ token: token }, window.location.origin);
-                window.close();
-                return;
-              }
-            } catch (err) {
-              console.error(err);
-            }
-            window.location.replace('/test-ui');
-          })();
-        </script>
-        </body>
-        </html>
-        """.formatted(safeToken, TestUiLoginConstants.TEST_UI_STORAGE_KEY);
-  }
 }
+
+
