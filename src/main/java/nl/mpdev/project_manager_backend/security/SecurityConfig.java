@@ -176,3 +176,4 @@ public class SecurityConfig {
         """.formatted(safeToken, TestUiLoginConstants.TEST_UI_STORAGE_KEY);
   }
 }
+
