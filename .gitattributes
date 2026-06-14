@@ -1,2 +1,8 @@
+* text eol=crlf
 /mvnw text eol=lf
 *.cmd text eol=crlf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+
