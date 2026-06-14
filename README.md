@@ -3,7 +3,7 @@
 A single-user project management dashboard built with Java Spring Boot backend.
 
 ## Functional requirements
-- The system must allow the admin to log in securely. (Try to add OAuth as well)
+- The system must allow the admin to log in securely via the API gateway (OAuth/JWT are terminated there).
 - The admin must be able to create new projects with a title, description, and publish flag.
 - The admin must be able to update project details.
 - The admin must be able to delete projects.
@@ -31,31 +31,26 @@ A single-user project management dashboard built with Java Spring Boot backend.
 - Project image display
 
 ### User & Access Control
-- Persist a `User` entity for authentication
-- Map users to a collection of granted authorities/roles
-- Reuse authorities across users for simplified role management
+- Authentication, token minting, and role enforcement now live inside the `mpdev-api-gateway` service.
+- This microservice trusts the gateway’s JWTs and focuses purely on domain logic.
 
 ### Backend
 - Java Spring Boot
-- Spring Security
-- JPA/Hibernate
+- Spring Data JPA / Hibernate
 - GitHub API Integration
-- Will be used as as small Micro-service
+- Delivered as a focused microservice behind the gateway
 
 ## Future Enhancements
 - Database schema implementation
 - Project tagging system
 - Search and filtering capabilities
-- JWT authentication
-- OAuth authentication
 
 
 ## Learning objectives
 - Catch up with Java skills
-- Add OAuth.
-- Testing out some more CI/CD practices
-- Designing Micro-services
-- Learning to develop in Neovim in combination with java/spring.
+- Testing out more CI/CD practices
+- Designing microservices that sit behind an API gateway
+- Learning to develop in Neovim in combination with Java/Spring
 
 ```mermaid
 classDiagram
@@ -86,20 +81,7 @@ classDiagram
         +Long projectId
     }
 
-    class User {
-        +Long id
-        +String username
-        +String password
-        +String email
-    }
-
-    class Authority {
-        +Long id
-        +String name
-    }
-
     Task "0..*" --> "1" Status
     Project "1" --> "0..*" Task : contains
     Project "1" --> "0..*" Image
-    User "1" --> "0..*" Authority : granted
 ```
